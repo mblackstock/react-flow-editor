@@ -1,0 +1,101 @@
+/* style guide https://codepen.io/adrifolio/pen/GvXVgP */
+
+/* light-gray #c5cad3 */
+/* dark-gray #2c313a; */
+
+/** Variables 
+@gray-dark: #2c313a;
+@gray-base: #5c6370;
+@gray-light: #c5cad3;
+@gray-lighter: #d7dae0;
+@gray-lightest: #dcdfe4;
+@blue: #1f96ff;
+@border-default: 1px solid @gray-light;
+**/
+
+.app {
+  display: grid;
+  grid-template-rows: auto 30px;    /* sidebar and main in first row, footer in bottom row */
+  grid-template-columns: 200px 1fr; /* sidebar is 200px, main is remainder */
+  height: 100vh;
+}
+
+/** Panel Module **/
+.panel {
+	display: grid;
+	grid-template-rows: 30px auto;  /* header followed by body */
+}
+
+.panel-body {
+  border-top: 1px solid #c5cad3;
+	overflow-y: scroll; 
+}
+
+/** Editor **/
+.main {
+  display: grid;
+}
+
+.main .panel-body {
+  overflow-x: scroll;
+  height: calc(100vh - 61px);   /* not sure why it is 61 here */
+}
+
+/* box around drawing area */
+.editor svg {
+  border: 1px solid black;
+}
+
+.sidebar {
+	border-right: 1px solid #c5cad3;
+}
+
+.sidebar .panel {
+  height: calc(100vh - 30px);
+}
+
+.palette-node {
+  display: flex;
+  margin: 5px;
+  border: 3px solid #5c6370 ;
+  padding: 8px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer {
+  display: grid;
+  align-items: center;
+	border-top: 1px solid #c5cad3;
+  grid-template-columns: 1fr auto;
+	grid-column-start: 1;
+	grid-column-end:   3;
+}
+
+.footer-controls {
+  display: flex;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.footer-controls a {
+  height: 100%;
+  display: flex;
+  padding-left:10px;
+  align-items: center;
+}
+
+.footer-file-info {
+  padding-left: 10px;
+  overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+

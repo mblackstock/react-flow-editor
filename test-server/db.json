@@ -1,0 +1,12 @@
+{
+    "nodes": [
+      {
+        "id": 1,
+        "name": "inject"
+      },
+      {
+        "id": 2,
+        "name": "debug"
+      }
+    ]
+  }
