@@ -53,8 +53,8 @@ const EditorNode = ({ x, y, name }) => {
                 fill: "rgb(200,200,200)",
                 strokeWidth: 2,
                 stroke: "rgb(0,0,0)",
-                rx: 5,
-                ry: 5
+                rx: 8,
+                ry: 8
             }} />
             <text x="20" y="20">{name}</text>
         </g>);

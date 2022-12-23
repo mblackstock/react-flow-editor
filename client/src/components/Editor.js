@@ -27,7 +27,8 @@ const Editor = () => {
 
     return (
         <div className="editor" >
-            <svg width="1000px" height="1000px" onDrop={drop} onDragOver={onDragOver}>
+            <svg width="1000px" height="1000px" shape-rendering="geometricPrecision"
+                onDrop={drop} onDragOver={onDragOver}>
                 {nodes.map((node) => (<EditorNode key={node.id} x={node.x} y={node.y} name={node.name}/>))}
             </svg>
         </div>)
