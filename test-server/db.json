@@ -2,11 +2,11 @@
     "nodes": [
       {
         "id": 1,
-        "name": "inject"
+        "type": "inject"
       },
       {
         "id": 2,
-        "name": "debug"
+        "type": "debug"
       }
     ]
   }

@@ -6,14 +6,21 @@ const Editor = () => {
     // nodes in the current flow
     const [nodes, setNodes] = useState([])
 
+    // generate a unique node id
+    const generateId = () => (Math.floor(1 + Math.random() * 4294967295)).toString(16);
+
     const drop = (e) => {
+        e.preventDefault();
         // note e.target.getBoundingClientRect() gets child element bounding box, not the div!
         var rect = e.currentTarget.getBoundingClientRect();
+        const nodeType = e.dataTransfer.getData("text");
+        console.log(nodeType)
         var x = e.clientX - rect.left; //x position within the element.
         var y = e.clientY - rect.top;  //y position within the element.
+        // create a new node
         const newNode = {
-            id: Math.floor(Math.random() * 100000), //TODO
-            name: 'hello',
+            id: generateId(),
+            name: nodeType,
             x, y
         }
         // add element there
@@ -27,9 +34,13 @@ const Editor = () => {
 
     return (
         <div className="editor" >
-            <svg width="1000px" height="1000px" shape-rendering="geometricPrecision"
-                onDrop={drop} onDragOver={onDragOver}>
-                {nodes.map((node) => (<EditorNode key={node.id} x={node.x} y={node.y} name={node.name}/>))}
+            <svg width="1000px" height="1000px"
+                shapeRendering="geometricPrecision"
+                onDrop={drop}
+                onDragOver={onDragOver}>
+                <g className="all-nodes" >
+                    {nodes.map((node) => (<EditorNode key={node.id} x={node.x} y={node.y} name={node.name}/>))}
+                </g>
             </svg>
         </div>)
 }

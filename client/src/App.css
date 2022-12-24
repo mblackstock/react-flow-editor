@@ -57,7 +57,7 @@
 .palette-node {
   display: flex;
   margin: 5px;
-  border: 3px solid #5c6370 ;
+  border: 2px solid #5c6370 ;
   padding: 8px;
   align-items: center;
   justify-content: center;

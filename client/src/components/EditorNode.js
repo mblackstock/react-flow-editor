@@ -46,17 +46,16 @@ const EditorNode = ({ x, y, name }) => {
     }
 
     return (
-        <g transform={`translate(${position.x - 50} ${position.y - 15})`}
+        <g className="node" transform={`translate(${position.x - 50} ${position.y - 15})`} style={{
+            fill: "rgb(166, 187, 207)",
+            strokeWidth: 2,
+            stroke: "#999",
+            cursor: "move"
+        }}
             onMouseDown={startDrag}
             onMouseUp={endDrag}>
-            <rect width="100" height="30" style={{
-                fill: "rgb(200,200,200)",
-                strokeWidth: 2,
-                stroke: "rgb(0,0,0)",
-                rx: 8,
-                ry: 8
-            }} />
-            <text x="20" y="20">{name}</text>
+            <rect width="100" height="30"  rx="8" ry="8" />
+            <text x="20" y="20" style={{strokeWidth: 1, stroke: "#000"}}>{name}</text>
         </g>);
 
 }
