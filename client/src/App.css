@@ -41,27 +41,12 @@
   height: calc(100vh - 61px);   /* not sure why it is 61 here */
 }
 
-/* box around drawing area */
-.editor svg {
-  border: 1px solid black;
-}
-
 .sidebar {
 	border-right: 1px solid #c5cad3;
 }
 
 .sidebar .panel {
   height: calc(100vh - 30px);
-}
-
-.palette-node {
-  display: flex;
-  margin: 5px;
-  border: 2px solid #5c6370 ;
-  padding: 8px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
 }
 
 .panel-header {
@@ -99,3 +84,59 @@
 	white-space: nowrap;
 }
 
+/* palette */
+
+.palette-node {
+  display: flex;
+  align-items: center;
+  cursor: move;
+  background: rgb(222, 222, 222);
+  margin: 10px auto;
+  height: 25px;
+  border-radius: 5px;
+  border: 1px solid #999;
+  background-position: 5% 50%;  /* for icon */
+  background-repeat: no-repeat;
+  width: 120px;
+  background-size: contain;
+  position: relative;
+}
+
+.palette-node-label {
+  color: #333;
+  font-size: 13px;
+  margin: 4px 0 4px 32px;
+  line-height: 20px;
+  overflow: hidden;
+  text-align: center;
+  user-select: none;
+}
+
+/* Editor */
+
+/* box around editor */
+
+.editor svg {
+  border: 1px solid black;
+}
+
+
+.editor-node {
+  fill: rgb(166, 187, 207);
+  stroke: #999;
+  cursor: move;
+  stroke-width: 2;
+}
+
+.editor-node-selected {
+  stroke: #ff7f0e;
+  stroke-width: 3
+}
+
+.editor-node-label {
+  fill: #000;
+  stroke: none;
+  cursor: move;
+  stroke-width: 1px;
+  fill: black;
+}

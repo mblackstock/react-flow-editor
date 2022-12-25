@@ -10,7 +10,7 @@ const PaletteNode = ({ id, type }) => {
     return (<div className="palette-node"
         onDragStart={(e) => dragStart(e, id)}
         draggable="true">
-        {type}
+        <div className="palette-node-label">{type}</div>
     </div>)
 }
 

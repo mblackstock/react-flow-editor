@@ -39,7 +39,7 @@ const Editor = () => {
                 onDrop={drop}
                 onDragOver={onDragOver}>
                 <g className="all-nodes" >
-                    {nodes.map((node) => (<EditorNode key={node.id} x={node.x} y={node.y} name={node.name}/>))}
+                    {nodes.map((node) => (<EditorNode key={node.id} id={node.id} x={node.x} y={node.y} name={node.name}/>))}
                 </g>
             </svg>
         </div>)
