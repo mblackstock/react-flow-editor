@@ -4,13 +4,26 @@
         "id": 1,
         "type": "inject",
         "inputs": 0,
-        "outputs": 1
+        "outputs": 1,
+        "defaults": {
+          "label": "Inject"
+        }
       },
       {
         "id": 2,
         "type": "debug",
-        "outputs":0,
-        "inputs": 1
+        "outputs": 0,
+        "inputs": 1,
+        "defaults": {
+          "label": "Debug"
+        }
+      }
+    ],
+    "flows": [
+      {
+        "id": 1,
+        "nodes": [],
+        "wires": []
       }
     ]
   }

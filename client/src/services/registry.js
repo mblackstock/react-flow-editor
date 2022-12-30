@@ -1,5 +1,11 @@
+/**
+ * Node registry.
+ * 
+ * Makes it straightforward to get information about nodes available from the server
+ * Call init first asynchronously to load nodes, then call getNodes, or getNodeByType
+ * 
+ */
 
-// cache nodes in case we already have them
 var nodes = [];
 var nodeMap = {};
 

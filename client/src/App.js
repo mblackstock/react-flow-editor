@@ -1,13 +1,16 @@
 import './App.css';
 import { useState, useEffect } from 'react'
 
-import Palette from './components/Palette';
+import Palette from './components/Palette/Palette';
 import Editor from './components/Editor';
+import Modal from "./components/Modal/Modal";
+
 import * as registry from './services/registry'
 
 function App() {
 
   const [nodes, setNodes] = useState([])
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     // wrap in async function so we can call await
@@ -48,10 +51,14 @@ function App() {
           <a href="/">Less</a>
           <a href="/"><span className="icon-git-branch"></span>master</a>
           <a href="/">⬇︎ 5 ⬆︎</a>
+          <button onClick={() => setShowModal(true)}>Test Modal</button>
           <a href="/"><span className="icon-diff"></span>1 file</a>
           <a href="/"><span className="icon-squirrel"></span></a>
         </div>
       </div>
+      <Modal title="My Modal" onClose={() => setShowModal(false)} show={showModal}>
+        <p>This is modal body</p>
+      </Modal>
     </div>
   );
 }
