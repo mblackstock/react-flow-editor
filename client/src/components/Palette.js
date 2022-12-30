@@ -7,6 +7,8 @@ const Palette = ({nodes}) => {
             <PaletteNode
                 key={node.id}
                 type={node.type}
+                inputs={node.inputs}
+                outputs={node.outputs}
                 />))}
         </div>)
 }

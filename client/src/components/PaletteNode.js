@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 
-const PaletteNode = ({ id, type }) => {
+const PaletteNode = ({ id, type, outputs, inputs }) => {
 
     const dragStart = (e, id) => {
         // send type of node to editor drop
@@ -11,6 +11,8 @@ const PaletteNode = ({ id, type }) => {
         onDragStart={(e) => dragStart(e, id)}
         draggable="true">
         <div className="palette-node-label">{type}</div>
+        {inputs > 0 && <div className="palette-port"/>}
+        {outputs > 0 && <div className="palette-port palette-port-output"/>}
     </div>)
 }
 

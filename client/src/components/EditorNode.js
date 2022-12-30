@@ -1,9 +1,9 @@
-import { useState, useRef } from "react";
-
+import { useState, useRef, useCallback } from "react";
+import { getNodeByType } from "../services/registry";
 // see https://stackoverflow.com/questions/53458053/how-to-handle-react-svg-drag-and-drop-with-react-hooks
 
 // SvgNode
-const EditorNode = ({ id, x, y, name }) => {
+const EditorNode = ({ id, x, y, type }) => {
 
     const [position, setPosition] = useState({
         x,
@@ -15,9 +15,9 @@ const EditorNode = ({ id, x, y, name }) => {
 
     const [selected, setSelected] = useState(false);
 
-    // Use useRef to create the function once and hold a reference to it.  Otherwise
-    // a different function is created every time!
-    const handleMouseMove = useRef((e) => {
+    // Use useCallback to create the function once and hold a reference to it.  Otherwise
+    // a different function is created every time its rendered
+    const handleMouseMove = useCallback((e) => {
         // we are dragging
         isDrag.current = true;
         setPosition(position => {
@@ -32,7 +32,7 @@ const EditorNode = ({ id, x, y, name }) => {
                 },
             };
         });
-    });
+    },[]);
 
     const onMouseDown = (e) => {
         // assume we are not dragging until we get a mouse move event
@@ -45,7 +45,7 @@ const EditorNode = ({ id, x, y, name }) => {
                 y: pageY,
             },
         }));
-        document.addEventListener('mousemove', handleMouseMove.current);
+        document.addEventListener('mousemove', handleMouseMove);
     }
 
     const onMouseUp = (e) => {
@@ -53,16 +53,21 @@ const EditorNode = ({ id, x, y, name }) => {
         if (!isDrag.current) {
             setSelected(!selected);
         }
-        document.removeEventListener('mousemove', handleMouseMove.current);
+        document.removeEventListener('mousemove', handleMouseMove);
         setPosition({ ...position, coords: {} })
     }
+
+    var node = getNodeByType(type);
 
     return (
         <g className={`editor-node ${selected?"editor-node-selected":""}`} transform={`translate(${position.x - 50} ${position.y - 15})`}
             onMouseDown={onMouseDown}
             onMouseUp={onMouseUp}>
-            <rect width="100" height="30"  rx="8" ry="8" />
-            <text className="editor-node-label" x="20" y="20" >{name}</text>
+            <rect width="100" height="30"  rx="5" ry="5" />
+            <text className="editor-node-label" x="20" y="20" >{type}</text>
+            <text className="editor-node-label" x="20" y="20" >{type}</text>
+            {node.inputs > 0 && <rect width="10" height="10" rx="3" ry="3" x="-5" y="10" />}
+            {node.outputs > 0 && <rect width="10" height="10" rx="3" ry="3" x="95" y="10" />}
         </g>);
 
 }

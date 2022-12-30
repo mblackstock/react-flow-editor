@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 
 import Palette from './components/Palette';
 import Editor from './components/Editor';
-import { fetchNodes } from './services/nodes'
+import * as registry from './services/registry'
 
 function App() {
 
@@ -11,11 +11,12 @@ function App() {
 
   useEffect(() => {
     // wrap in async function so we can call await
-    const getNodes = async () => {
-      const nodesFromServer = await fetchNodes()
-      setNodes(nodesFromServer)
+    const initAll = async () => {
+      await registry.init();
+      setNodes(registry.getNodes());
     }
-    getNodes()
+    initAll().catch(console.error);
+
   }, [])
 
   return (

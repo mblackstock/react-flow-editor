@@ -24,4 +24,9 @@ Drag and drop SVG components
 https://stackoverflow.com/questions/53458053/how-to-handle-react-svg-drag-and-drop-with-react-hooks
 
 
+Next steps
+- decide on data structure for flows (similar to Node-RED or?)
+- add connectors
+- add registry service
+
 

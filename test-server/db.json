@@ -2,11 +2,15 @@
     "nodes": [
       {
         "id": 1,
-        "type": "inject"
+        "type": "inject",
+        "inputs": 0,
+        "outputs": 1
       },
       {
         "id": 2,
-        "type": "debug"
+        "type": "debug",
+        "outputs":0,
+        "inputs": 1
       }
     ]
   }

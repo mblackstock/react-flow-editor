@@ -20,7 +20,7 @@ const Editor = () => {
         // create a new node
         const newNode = {
             id: generateId(),
-            name: nodeType,
+            type: nodeType,
             x, y
         }
         // add element there
@@ -39,7 +39,14 @@ const Editor = () => {
                 onDrop={drop}
                 onDragOver={onDragOver}>
                 <g className="all-nodes" >
-                    {nodes.map((node) => (<EditorNode key={node.id} id={node.id} x={node.x} y={node.y} name={node.name}/>))}
+                    {nodes.map((node) => (<EditorNode
+                        key={node.id}
+                        id={node.id}
+                        x={node.x}
+                        y={node.y}
+                        type={node.type}/>))}
+                </g>
+                <g className="all-wires" >
                 </g>
             </svg>
         </div>)
