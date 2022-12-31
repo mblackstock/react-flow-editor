@@ -1,4 +1,4 @@
-import PaletteNode from '../PaletteNode'
+import PaletteNode from './PaletteNode'
 import "./Palette.css";
 
 const Palette = ({nodes}) => {

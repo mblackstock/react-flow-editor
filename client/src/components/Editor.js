@@ -1,10 +1,18 @@
 import EditorNode from "./EditorNode";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const Editor = () => {
+const Editor = ({flow}) => {
 
-    // nodes in the current flow
+    // nodes, wires, tabs in current flow
     const [nodes, setNodes] = useState([])
+    // [wires, setWires] = useState([])
+    // [tabs, setTabs] = useState([])
+
+    useEffect(() => {
+        if (flow?.nodes) {
+            setNodes(flow.nodes)
+        }
+    }, [flow])
 
     // generate a unique node id
     const generateId = () => (Math.floor(1 + Math.random() * 4294967295)).toString(16);
@@ -47,6 +55,7 @@ const Editor = () => {
                         type={node.type}/>))}
                 </g>
                 <g className="all-wires" >
+                    <path className="hidden wire" d="M0,0L0,0"/>
                 </g>
             </svg>
         </div>)

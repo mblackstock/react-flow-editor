@@ -22,7 +22,16 @@
     "flows": [
       {
         "id": 1,
-        "nodes": [],
+        "nodes": [{
+          "x":200,
+          "y":200,
+          "type": "debug"
+        },
+        {
+          "x":250,
+          "y":250,
+          "type": "inject"
+        }],
         "wires": []
       }
     ]

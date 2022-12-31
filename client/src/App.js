@@ -6,17 +6,30 @@ import Editor from './components/Editor';
 import Modal from "./components/Modal/Modal";
 
 import * as registry from './services/registry'
+import * as flowService from './services/flow'
 
 function App() {
 
   const [nodes, setNodes] = useState([])
+  const [flow, setFlow] = useState({})
+
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     // wrap in async function so we can call await
     const initAll = async () => {
+
       await registry.init();
       setNodes(registry.getNodes());
+
+      // for now we are a single user, always get the first flow
+      await flowService.init();
+      let flowIds = await flowService.getFlowIds()
+      let flow = {};
+      if (flowIds.length > 0) {
+        flow = await flowService.getFlowById(flowIds[0]);
+      }
+      setFlow(flow)
     }
     initAll().catch(console.error);
 
@@ -36,7 +49,7 @@ function App() {
         <div className="panel">
           <div className="panel-header">Editor</div>
           <div className="panel-body">
-            <Editor />
+            <Editor flow={flow}/>
           </div>
         </div>
       </div>

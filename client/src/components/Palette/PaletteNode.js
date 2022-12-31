@@ -1,5 +1,3 @@
-import { useState, useRef } from 'react';
-
 const PaletteNode = ({ id, type, outputs, inputs }) => {
 
     const dragStart = (e, id) => {

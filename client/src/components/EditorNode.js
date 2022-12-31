@@ -1,8 +1,14 @@
+/**
+ * EditorNode
+ * 
+ * Displays a node in the editor using SVG.
+ * 
+ * @link https://stackoverflow.com/questions/53458053/how-to-handle-react-svg-drag-and-drop-with-react-hooks
+ */
+
 import { useState, useRef, useCallback } from "react";
 import { getNodeByType } from "../services/registry";
-// see https://stackoverflow.com/questions/53458053/how-to-handle-react-svg-drag-and-drop-with-react-hooks
 
-// SvgNode
 const EditorNode = ({ id, x, y, type }) => {
 
     const [position, setPosition] = useState({
@@ -64,7 +70,6 @@ const EditorNode = ({ id, x, y, type }) => {
             onMouseDown={onMouseDown}
             onMouseUp={onMouseUp}>
             <rect width="100" height="30"  rx="5" ry="5" />
-            <text className="editor-node-label" x="20" y="20" >{type}</text>
             <text className="editor-node-label" x="20" y="20" >{type}</text>
             {node.inputs > 0 && <rect width="10" height="10" rx="3" ry="3" x="-5" y="10" />}
             {node.outputs > 0 && <rect width="10" height="10" rx="3" ry="3" x="95" y="10" />}
