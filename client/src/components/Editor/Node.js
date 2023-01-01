@@ -1,5 +1,5 @@
 /**
- * EditorNode
+ * Node
  * 
  * Displays a node in the editor using SVG.
  * 
@@ -7,15 +7,14 @@
  */
 
 import { useState, useRef, useCallback } from "react";
-import * as registry from "../services/registry";
-
+import * as registry from "../../services/registry";
+import { Port, PORT_HEIGHT_WIDTH } from "./Port";
 
 const PORT_MARGIN = 8;
-const PORT_HEIGHT_WIDTH = 10;
 const PORT_SPACING = 4;
 const NODE_WIDTH = 100;
 
-const EditorNode = ({ id, x, y, type }) => {
+const Node = ({ id, x, y, type }) => {
 
     const [position, setPosition] = useState({
         x,
@@ -79,10 +78,7 @@ const EditorNode = ({ id, x, y, type }) => {
     let inputs = [];
     for (let i=0; i<node.inputs; i++) {
         let yPos = PORT_MARGIN+i*(PORT_HEIGHT_WIDTH+PORT_SPACING);
-        inputs.push(<rect key={i+1}
-            width={PORT_HEIGHT_WIDTH}
-            height={PORT_HEIGHT_WIDTH}
-            rx="3" ry="3"
+        inputs.push(<Port key={i+1}
             x={-PORT_HEIGHT_WIDTH/2}
             y={yPos} />)
     }
@@ -90,10 +86,7 @@ const EditorNode = ({ id, x, y, type }) => {
     let outputs = [];
     for (let i=0; i<node.outputs; i++) {
         let yPos = PORT_MARGIN+i*(PORT_HEIGHT_WIDTH+PORT_SPACING);
-        outputs.push(<rect key={i+1}
-            width="10"
-            height="10"
-            rx="3" ry="3"
+        outputs.push(<Port key={i+1}
             x={NODE_WIDTH-PORT_HEIGHT_WIDTH/2}
             y={yPos} />)
     }
@@ -110,4 +103,4 @@ const EditorNode = ({ id, x, y, type }) => {
 
 }
 
-export default EditorNode;
+export default Node;

@@ -2,7 +2,7 @@ import './App.css';
 import { useState, useEffect } from 'react'
 
 import Palette from './components/Palette/Palette';
-import Editor from './components/Editor';
+import Editor from './components/Editor/Editor';
 import Modal from "./components/Modal/Modal";
 
 import * as registry from './services/registry'

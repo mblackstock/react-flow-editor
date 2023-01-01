@@ -1,4 +1,4 @@
-const PaletteNode = ({ id, type, outputs, inputs }) => {
+const Node = ({ id, type, outputs, inputs }) => {
 
     const dragStart = (e, id) => {
         // send type of node to editor drop
@@ -14,4 +14,4 @@ const PaletteNode = ({ id, type, outputs, inputs }) => {
     </div>)
 }
 
-export default PaletteNode;
+export default Node;

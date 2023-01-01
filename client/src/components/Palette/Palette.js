@@ -1,11 +1,11 @@
-import PaletteNode from './PaletteNode'
+import Node from './Node'
 import "./Palette.css";
 
 const Palette = ({nodes}) => {
 
     return (<div className="palette">
         {nodes && nodes.map((node, index) => (
-            <PaletteNode
+            <Node
                 key={node.id}
                 type={node.type}
                 inputs={node.inputs}

@@ -1,4 +1,4 @@
-import EditorNode from "./EditorNode";
+import Node from "./Node";
 import Wire from "./Wire"
 import "./Editor.css";
 
@@ -50,7 +50,7 @@ const Editor = ({flow}) => {
                 onDrop={drop}
                 onDragOver={onDragOver}>
                 <g className="all-nodes" >
-                    {nodes.map((node) => (<EditorNode
+                    {nodes.map((node) => (<Node
                         key={node.id}
                         id={node.id}
                         x={node.x}
