@@ -17,6 +17,15 @@
         "defaults": {
           "label": "Debug"
         }
+      },
+      {
+        "id": 2,
+        "type": "function",
+        "outputs": 3,
+        "inputs": 1,
+        "defaults": {
+          "label": "Function"
+        }
       }
     ],
     "flows": [

@@ -7,7 +7,13 @@
  */
 
 import { useState, useRef, useCallback } from "react";
-import { getNodeByType } from "../services/registry";
+import * as registry from "../services/registry";
+
+
+const PORT_MARGIN = 8;
+const PORT_HEIGHT_WIDTH = 10;
+const PORT_SPACING = 4;
+const NODE_WIDTH = 100;
 
 const EditorNode = ({ id, x, y, type }) => {
 
@@ -63,16 +69,43 @@ const EditorNode = ({ id, x, y, type }) => {
         setPosition({ ...position, coords: {} })
     }
 
-    var node = getNodeByType(type);
+    // TODO: from registry, create flow node entry
+    let nodeFromRegistry = registry.getNodeByType(type);
+    let node = {...nodeFromRegistry, id:id}
+
+    let maxPorts = Math.max(node.inputs, node.outputs);
+    let nodeHeight = PORT_MARGIN*2+maxPorts*(PORT_HEIGHT_WIDTH+PORT_SPACING)-PORT_SPACING;
+
+    let inputs = [];
+    for (let i=0; i<node.inputs; i++) {
+        let yPos = PORT_MARGIN+i*(PORT_HEIGHT_WIDTH+PORT_SPACING);
+        inputs.push(<rect key={i+1}
+            width={PORT_HEIGHT_WIDTH}
+            height={PORT_HEIGHT_WIDTH}
+            rx="3" ry="3"
+            x={-PORT_HEIGHT_WIDTH/2}
+            y={yPos} />)
+    }
+
+    let outputs = [];
+    for (let i=0; i<node.outputs; i++) {
+        let yPos = PORT_MARGIN+i*(PORT_HEIGHT_WIDTH+PORT_SPACING);
+        outputs.push(<rect key={i+1}
+            width="10"
+            height="10"
+            rx="3" ry="3"
+            x={NODE_WIDTH-PORT_HEIGHT_WIDTH/2}
+            y={yPos} />)
+    }
 
     return (
         <g className={`editor-node ${selected?"editor-node-selected":""}`} transform={`translate(${position.x - 50} ${position.y - 15})`}
             onMouseDown={onMouseDown}
             onMouseUp={onMouseUp}>
-            <rect width="100" height="30"  rx="5" ry="5" />
-            <text className="editor-node-label" x="20" y="20" >{type}</text>
-            {node.inputs > 0 && <rect width="10" height="10" rx="3" ry="3" x="-5" y="10" />}
-            {node.outputs > 0 && <rect width="10" height="10" rx="3" ry="3" x="95" y="10" />}
+            <rect width={NODE_WIDTH} height={nodeHeight} rx="5" ry="5" />
+            <text className="editor-node-label" x="20" y="18" >{type}</text>
+            {inputs}
+            {outputs}
         </g>);
 
 }

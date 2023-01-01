@@ -1,4 +1,7 @@
 import EditorNode from "./EditorNode";
+import Wire from "./Wire"
+import "./Editor.css";
+
 import { useState, useEffect } from 'react';
 
 const Editor = ({flow}) => {
@@ -55,7 +58,7 @@ const Editor = ({flow}) => {
                         type={node.type}/>))}
                 </g>
                 <g className="all-wires" >
-                    <path className="hidden wire" d="M0,0L0,0"/>
+                    <Wire hidden={true} x1={200} y1={200} x2={300} y2={350}/>
                 </g>
             </svg>
         </div>)
