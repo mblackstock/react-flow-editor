@@ -58,8 +58,8 @@ const Editor = ({flow}) => {
                         type={node.type}/>))}
                 </g>
                 <g className="all-wires" >
-                    <Wire hidden={true} x1={200} y1={200} x2={300} y2={350}/>
                 </g>
+                <Wire hidden={true} x1={200} y1={200} x2={300} y2={350}/>
             </svg>
         </div>)
 }

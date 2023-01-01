@@ -19,7 +19,7 @@
         }
       },
       {
-        "id": 2,
+        "id": 3,
         "type": "function",
         "outputs": 3,
         "inputs": 1,
@@ -32,11 +32,13 @@
       {
         "id": 1,
         "nodes": [{
+          "id": "123abc",
           "x":200,
           "y":200,
           "type": "debug"
         },
         {
+          "id": "124abc",
           "x":250,
           "y":250,
           "type": "inject"

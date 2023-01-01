@@ -43,7 +43,7 @@ const Node = ({ id, x, y, type }) => {
                 },
             };
         });
-    },[]);
+    }, []);
 
     const onMouseDown = (e) => {
         // assume we are not dragging until we get a mouse move event
@@ -68,38 +68,63 @@ const Node = ({ id, x, y, type }) => {
         setPosition({ ...position, coords: {} })
     }
 
+    const onPortMouseUp = (e) => {
+        console.log("port Mouse Up");
+    }
+
+    const onPortMouseDown = (e) => {
+        console.log("port Mouse Down");
+    }
+
     // TODO: from registry, create flow node entry
     let nodeFromRegistry = registry.getNodeByType(type);
-    let node = {...nodeFromRegistry, id:id}
+    let node = { ...nodeFromRegistry, id }
 
     let maxPorts = Math.max(node.inputs, node.outputs);
-    let nodeHeight = PORT_MARGIN*2+maxPorts*(PORT_HEIGHT_WIDTH+PORT_SPACING)-PORT_SPACING;
+    let nodeHeight = PORT_MARGIN * 2 + maxPorts * (PORT_HEIGHT_WIDTH + PORT_SPACING) - PORT_SPACING;
 
     let inputs = [];
-    for (let i=0; i<node.inputs; i++) {
-        let yPos = PORT_MARGIN+i*(PORT_HEIGHT_WIDTH+PORT_SPACING);
-        inputs.push(<Port key={i+1}
-            x={-PORT_HEIGHT_WIDTH/2}
-            y={yPos} />)
+    let key = 1;
+    for (let i = 0; i < node.inputs; i++) {
+        let yPos = PORT_MARGIN + i * (PORT_HEIGHT_WIDTH + PORT_SPACING);
+        inputs.push(<Port
+            key={key}
+            x={-PORT_HEIGHT_WIDTH / 2}
+            y={yPos}
+            mouseDown={onPortMouseDown}
+            mouseUp={onPortMouseUp}
+        />)
+        key++;
     }
 
     let outputs = [];
-    for (let i=0; i<node.outputs; i++) {
-        let yPos = PORT_MARGIN+i*(PORT_HEIGHT_WIDTH+PORT_SPACING);
-        outputs.push(<Port key={i+1}
-            x={NODE_WIDTH-PORT_HEIGHT_WIDTH/2}
-            y={yPos} />)
+    for (let i = 0; i < node.outputs; i++) {
+        let yPos = PORT_MARGIN + i * (PORT_HEIGHT_WIDTH + PORT_SPACING);
+        outputs.push(<Port
+            key={key}
+            x={NODE_WIDTH - PORT_HEIGHT_WIDTH / 2}
+            y={yPos}
+            mouseDown={onPortMouseDown}
+            mouseUp={onPortMouseUp}
+        />)
+        key++;
     }
 
+    // note that we add mousdown/up events to sub elements.  If we add it to the group
+    // then the ports don't get events.
     return (
-        <g className={`editor-node ${selected?"editor-node-selected":""}`} transform={`translate(${position.x - 50} ${position.y - 15})`}
-            onMouseDown={onMouseDown}
-            onMouseUp={onMouseUp}>
-            <rect width={NODE_WIDTH} height={nodeHeight} rx="5" ry="5" />
-            <text className="editor-node-label" x="20" y="18" >{type}</text>
+        <g className={`editor-node ${selected ? 'editor-node-selected' : ''}`}
+            transform={`translate(${position.x - 50} ${position.y - 15})`}>
+            <rect width={NODE_WIDTH} height={nodeHeight} rx="5" ry="5"
+                onMouseDown={onMouseDown}
+                onMouseUp={onMouseUp} />
+            <text className="editor-node-label" x="20" y="18"
+                onMouseDown={onMouseDown}
+                onMouseUp={onMouseUp}
+            >{type}</text>
             {inputs}
             {outputs}
-        </g>);
+        </g >);
 
 }
 
