@@ -14,7 +14,7 @@ const PORT_MARGIN = 8;
 const PORT_SPACING = 4;
 const NODE_WIDTH = 100;
 
-const Node = ({ id, x, y, type }) => {
+const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
 
     const [position, setPosition] = useState({
         x,
@@ -28,7 +28,7 @@ const Node = ({ id, x, y, type }) => {
 
     // Use useCallback to create the function once and hold a reference to it.  Otherwise
     // a different function is created every time its rendered
-    const handleMouseMove = useCallback((e) => {
+    const handleMouseMove = useRef((e) => {
         // we are dragging
         isDrag.current = true;
         setPosition(position => {
@@ -56,7 +56,7 @@ const Node = ({ id, x, y, type }) => {
                 y: pageY,
             },
         }));
-        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mousemove', handleMouseMove.current);
     }
 
     const onMouseUp = (e) => {
@@ -64,16 +64,21 @@ const Node = ({ id, x, y, type }) => {
         if (!isDrag.current) {
             setSelected(!selected);
         }
-        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mousemove', handleMouseMove.current);
         setPosition({ ...position, coords: {} })
     }
 
-    const onPortMouseUp = (e) => {
-        console.log("port Mouse Up");
+    const onPortMouseUp = (e, type, port) => {
+        console.log(`port mouse up${type} ${port}`);
+        wireEnd(e, id, type, port);
     }
 
-    const onPortMouseDown = (e) => {
-        console.log("port Mouse Down");
+    const onPortMouseDown = (e, portX, portY, type, port) => {
+        console.log(`port mouse down ${type} ${port}`);
+        // position of port is node position + port position
+        let wireX = position.x+portX-50;
+        let wireY = position.y+portY-15;
+        wireStart(e, id, wireX, wireY, type, port);
     }
 
     // TODO: from registry, create flow node entry
@@ -91,6 +96,8 @@ const Node = ({ id, x, y, type }) => {
             key={key}
             x={-PORT_HEIGHT_WIDTH / 2}
             y={yPos}
+            type='input'
+            port={i}
             mouseDown={onPortMouseDown}
             mouseUp={onPortMouseUp}
         />)
@@ -104,6 +111,8 @@ const Node = ({ id, x, y, type }) => {
             key={key}
             x={NODE_WIDTH - PORT_HEIGHT_WIDTH / 2}
             y={yPos}
+            type='output'
+            port={i}
             mouseDown={onPortMouseDown}
             mouseUp={onPortMouseUp}
         />)
