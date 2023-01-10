@@ -6,15 +6,38 @@
  * @link https://stackoverflow.com/questions/53458053/how-to-handle-react-svg-drag-and-drop-with-react-hooks
  */
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import * as registry from "../../services/registry";
 import { Port, PORT_HEIGHT_WIDTH } from "./Port";
 
 const PORT_MARGIN = 8;
 const PORT_SPACING = 4;
 const NODE_WIDTH = 100;
+const ICON_WIDTH = 20; // left margin
+const RIGHT_MARGIN = 15;
 
 const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
+
+    const textElement = useRef(null);
+    const rectElement = useRef(null);
+    const outputPorts = useRef([]);
+
+    useEffect(() => {
+        if (textElement.current === null)
+            return;
+
+        // adjust width of node based on label
+        const rectWidth = textElement.current.getComputedTextLength() + ICON_WIDTH + RIGHT_MARGIN;
+        rectElement.current.setAttribute("width", rectWidth);
+
+        // move the output ports in position after resize
+        for (const port of outputPorts.current) {
+            port.setAttribute("x", rectWidth - PORT_HEIGHT_WIDTH / 2)
+        }
+
+        // find the newly added wire and adjust its position?
+        
+    }, []);
 
     const [position, setPosition] = useState({
         x,
@@ -23,13 +46,13 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
     });
 
     const isDrag = useRef(false)
-
     const [selected, setSelected] = useState(false);
 
     // Use useCallback to create the function once and hold a reference to it.  Otherwise
     // a different function is created every time its rendered
-    const handleMouseMove = useRef((e) => {
+    const handleMouseMove = useCallback((e) => {
         // we are dragging
+        console.log('move')
         isDrag.current = true;
         setPosition(position => {
             const xDiff = position.coords.x - e.pageX;  // how far we moved
@@ -56,7 +79,7 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
                 y: pageY,
             },
         }));
-        document.addEventListener('mousemove', handleMouseMove.current);
+        document.addEventListener('mousemove', handleMouseMove);
     }
 
     const onMouseUp = (e) => {
@@ -64,7 +87,7 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
         if (!isDrag.current) {
             setSelected(!selected);
         }
-        document.removeEventListener('mousemove', handleMouseMove.current);
+        document.removeEventListener('mousemove', handleMouseMove);
         setPosition({ ...position, coords: {} })
     }
 
@@ -76,8 +99,8 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
     const onPortMouseDown = (e, portX, portY, type, port) => {
         console.log(`port mouse down ${type} ${port}`);
         // position of port is node position + port position
-        let wireX = position.x+portX-50;
-        let wireY = position.y+portY-15;
+        let wireX = position.x + portX - 50;
+        let wireY = position.y + portY - 15;
         wireStart(e, id, wireX, wireY, type, port);
     }
 
@@ -109,6 +132,7 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
         let yPos = PORT_MARGIN + i * (PORT_HEIGHT_WIDTH + PORT_SPACING);
         outputs.push(<Port
             key={key}
+            ref={(el) => outputPorts.current.push(el)}
             x={NODE_WIDTH - PORT_HEIGHT_WIDTH / 2}
             y={yPos}
             type='output'
@@ -124,10 +148,10 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
     return (
         <g className={`editor-node ${selected ? 'editor-node-selected' : ''}`}
             transform={`translate(${position.x - 50} ${position.y - 15})`}>
-            <rect width={NODE_WIDTH} height={nodeHeight} rx="5" ry="5"
+            <rect ref={rectElement} width={NODE_WIDTH} height={nodeHeight} rx="5" ry="5"
                 onMouseDown={onMouseDown}
                 onMouseUp={onMouseUp} />
-            <text className="editor-node-label" x="20" y="18"
+            <text ref={textElement} className="editor-node-label" x="20" y="18"
                 onMouseDown={onMouseDown}
                 onMouseUp={onMouseUp}
             >{type}</text>
@@ -135,6 +159,6 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
             {outputs}
         </g >);
 
-}
+};
 
 export default Node;

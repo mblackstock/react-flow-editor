@@ -54,7 +54,7 @@ const Editor = ({ flow }) => {
 
     // dragging the wire
 
-    const handleWireMouseMove = useRef((e) => {
+    const handleWireMouseMove = useCallback((e) => {
         e.preventDefault();
         const rect = svgElement.current.getBoundingClientRect();
         const x = e.clientX - rect.left; //x position within the element.
@@ -64,19 +64,56 @@ const Editor = ({ flow }) => {
         });
     }, []);
 
+    const handleMouseUp = useCallback((e) => {
+        // TODO: remove the drag wire and don't save since we didn't connect to 
+        // anything
+        // setDragWire({...dragWire, hidden: true});
+        document.removeEventListener('mousemove', handleWireMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+    });
+
     const wireStart = (e, id, x, y, type, port) => {
         console.log(`wire start ${e} ${id} ${type} ${port}`);
         setDragWire({ hidden: false, x1: x, y1: y, x2: x, y2: y });
-        document.addEventListener('mousemove', handleWireMouseMove.current);
+        // TODO: save start wire
+        document.addEventListener('mousemove', handleWireMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
     }
 
     const wireEnd = (e, id, type, port) => {
         console.log(`wire end ${e} ${id} ${type} ${port}`);
         setDragWire({...dragWire, hidden: false});
-        document.removeEventListener('mousemove', handleWireMouseMove.current);
-        // TODO: save the wire
+        document.removeEventListener('mousemove', handleWireMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+        // TODO: save the wire in state for rendering
+        /*
+        wire.startNode = saved start node
+        wire.startPort = saved start port
+        wire.endNode = id
+        wire.endPort = port
+        setWires([...wires, newWire])
+        */
     }
+
+
     // --end
+
+    // TODO:
+
+    /*
+    generate a list of wires.
+    need port locations, so probably best to move these to a helper service
+    */
+
+    const nodeList = nodes.map((node) => (<Node
+        key={node.id}
+        id={node.id}
+        x={node.x}
+        y={node.y}
+        type={node.type}
+        wireStart={wireStart}
+        wireEnd={wireEnd}
+    />));
 
     return (
         <div className="editor" >
@@ -90,19 +127,10 @@ const Editor = ({ flow }) => {
                     x2={dragWire.x2}
                     y2={dragWire.y2} />
                 <g className="all-nodes" >
-                    {nodes.map((node) => (<Node
-                        key={node.id}
-                        id={node.id}
-                        x={node.x}
-                        y={node.y}
-                        type={node.type}
-                        wireStart={wireStart}
-                        wireEnd={wireEnd}
-                    />))}
+                    {nodeList}
                 </g>
                 <g className="all-wires" >
                 </g>
-
             </svg>
         </div>)
 }
