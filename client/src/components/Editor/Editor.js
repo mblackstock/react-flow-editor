@@ -9,6 +9,7 @@ const Editor = ({ flow }) => {
     // nodes, wires, tabs in current flow
     const [nodes, setNodes] = useState([])
     const [dragWire, setDragWire] = useState({
+        start: 'out',
         hidden: true,
         x1: 0,
         y1: 0,
@@ -41,7 +42,7 @@ const Editor = ({ flow }) => {
         const newNode = {
             id: generateId(),
             type: nodeType,
-            x, y
+            x:x-50, y:y-15  // TODO: place it in the canvas more centered - figure out offsets?
         }
         // add element there
         setNodes([...nodes, newNode])
@@ -60,7 +61,22 @@ const Editor = ({ flow }) => {
         const x = e.clientX - rect.left; //x position within the element.
         const y = e.clientY - rect.top;  //y position within the element.
         setDragWire(dragWire => {
-            return {hidden:false, x1:dragWire.x1, y1:dragWire.y1, x2: x, y2: y }
+            const newDragWire = {
+                start: dragWire.start,
+                hidden:false
+            }
+            if (dragWire.start === 'out') {
+                newDragWire.x1 = dragWire.x1;
+                newDragWire.y1 = dragWire.y1;
+                newDragWire.x2 = x;
+                newDragWire.y2 = y;
+            } else {
+                newDragWire.x1 = x;
+                newDragWire.y1 = y;
+                newDragWire.x2 = dragWire.x2;
+                newDragWire.y2 = dragWire.y2;
+            }
+            return newDragWire;
         });
     }, []);
 
@@ -74,7 +90,7 @@ const Editor = ({ flow }) => {
 
     const wireStart = (e, id, x, y, type, port) => {
         console.log(`wire start ${e} ${id} ${type} ${port}`);
-        setDragWire({ hidden: false, x1: x, y1: y, x2: x, y2: y });
+        setDragWire({ start: type, hidden: false, x1: x, y1: y, x2: x, y2: y });
         // TODO: save start wire
         document.addEventListener('mousemove', handleWireMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
@@ -94,7 +110,6 @@ const Editor = ({ flow }) => {
         setWires([...wires, newWire])
         */
     }
-
 
     // --end
 

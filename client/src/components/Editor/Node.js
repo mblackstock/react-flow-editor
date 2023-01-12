@@ -36,7 +36,7 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
         }
 
         // find the newly added wire and adjust its position?
-        
+
     }, []);
 
     const [position, setPosition] = useState({
@@ -52,7 +52,6 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
     // a different function is created every time its rendered
     const handleMouseMove = useCallback((e) => {
         // we are dragging
-        console.log('move')
         isDrag.current = true;
         setPosition(position => {
             const xDiff = position.coords.x - e.pageX;  // how far we moved
@@ -66,6 +65,7 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
                 },
             };
         });
+        // TODO: callback for editor to move the wires along with the node
     }, []);
 
     const onMouseDown = (e) => {
@@ -99,8 +99,8 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
     const onPortMouseDown = (e, portX, portY, type, port) => {
         console.log(`port mouse down ${type} ${port}`);
         // position of port is node position + port position
-        let wireX = position.x + portX - 50;
-        let wireY = position.y + portY - 15;
+        let wireX = position.x + portX;
+        let wireY = position.y + portY;
         wireStart(e, id, wireX, wireY, type, port);
     }
 
@@ -119,7 +119,7 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
             key={key}
             x={-PORT_HEIGHT_WIDTH / 2}
             y={yPos}
-            type='input'
+            type='in'
             port={i}
             mouseDown={onPortMouseDown}
             mouseUp={onPortMouseUp}
@@ -135,7 +135,7 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
             ref={(el) => outputPorts.current.push(el)}
             x={NODE_WIDTH - PORT_HEIGHT_WIDTH / 2}
             y={yPos}
-            type='output'
+            type='out'
             port={i}
             mouseDown={onPortMouseDown}
             mouseUp={onPortMouseUp}
@@ -147,7 +147,7 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
     // then the ports don't get events.
     return (
         <g className={`editor-node ${selected ? 'editor-node-selected' : ''}`}
-            transform={`translate(${position.x - 50} ${position.y - 15})`}>
+            transform={`translate(${position.x} ${position.y})`}>
             <rect ref={rectElement} width={NODE_WIDTH} height={nodeHeight} rx="5" ry="5"
                 onMouseDown={onMouseDown}
                 onMouseUp={onMouseUp} />
