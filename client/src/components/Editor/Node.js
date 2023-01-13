@@ -22,6 +22,14 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd }, ref) => {
     const textElement = useRef(null);
     const rectElement = useRef(null);
     const outputPorts = useRef([]);
+    const outWires = useRef([]);
+    const inWires = useRef([]);
+
+    const [position, setPosition] = useState({
+        x,
+        y,
+        coords: {},
+    });
 
     useImperativeHandle(ref, () => {
         return {
@@ -31,9 +39,15 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd }, ref) => {
             const yPos = position.y + PORT_MARGIN + port * (PORT_HEIGHT_WIDTH + PORT_SPACING)+PORT_HEIGHT_WIDTH/2;
             const xPos = position.x + (type === 'out' ? rectWidth:0);
             return [xPos, yPos];
+          },
+          setOutWire: (el) => {
+            outWires.current.push(el);
+          },
+          setInWire: (el) => {
+            inWires.current.push(el);
           }
         };
-      }, []);
+      }, [position.x, position.y]);
 
     useEffect(() => {
         if (textElement.current === null)
@@ -45,18 +59,10 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd }, ref) => {
 
         // move the output ports in position after resize
         for (const port of outputPorts.current) {
-            port.setAttribute("x", rectWidth - PORT_HEIGHT_WIDTH / 2)
+            port.setX(rectWidth - PORT_HEIGHT_WIDTH / 2)
         }
 
-        // find the newly added wire and adjust its position?
-
     }, []);
-
-    const [position, setPosition] = useState({
-        x,
-        y,
-        coords: {},
-    });
 
     const isDrag = useRef(false)
     const [selected, setSelected] = useState(false);
@@ -66,9 +72,18 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd }, ref) => {
     const handleMouseMove = useCallback((e) => {
         // we are dragging
         isDrag.current = true;
+        
         setPosition(position => {
             const xDiff = position.coords.x - e.pageX;  // how far we moved
             const yDiff = position.coords.y - e.pageY;
+
+            // side effect of updating one component while updating this one.
+            // for (const el of outWires.current) {
+            //     el.moveStart(xDiff, yDiff);
+            // }
+            // for (const el of inWires.current) {
+            //     el.moveEnd(xDiff, yDiff);
+            // }
             return {
                 x: position.x - xDiff,                  // change group position by this amount
                 y: position.y - yDiff,
@@ -78,7 +93,6 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd }, ref) => {
                 },
             };
         });
-        // TODO: callback for editor to move the wires along with the node
     }, []);
 
     const onMouseDown = (e) => {
@@ -145,7 +159,7 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd }, ref) => {
         let yPos = PORT_MARGIN + i * (PORT_HEIGHT_WIDTH + PORT_SPACING);
         outputs.push(<Port
             key={key}
-            ref={(el) => outputPorts.current.push(el)}
+            ref={(el) => el && outputPorts.current.push(el)}
             x={NODE_WIDTH - PORT_HEIGHT_WIDTH / 2}
             y={yPos}
             type='out'

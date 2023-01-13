@@ -1,12 +1,21 @@
 
 
-import { useRef, forwardRef } from "react";
+import { useRef, forwardRef, useImperativeHandle } from "react";
 
 export const PORT_HEIGHT_WIDTH = 10;
 
 export const Port = forwardRef(({ x, y, type, port, mouseDown, mouseUp }, ref) => {
 
     const rectElement = useRef(null);
+
+    useImperativeHandle(ref, () => {
+        return {
+            // adjust with node width
+            setX: (x) => {
+                rectElement.current.setAttribute("x", x);
+            }
+        };
+      },[]);
 
     const handleMouseDown = (e) => {
         e.preventDefault();
@@ -23,18 +32,7 @@ export const Port = forwardRef(({ x, y, type, port, mouseDown, mouseUp }, ref) =
     }
 
     return (
-        <rect ref={(el) => {
-                // use ref to rectangle locally
-                rectElement.current = el;
-                // forward ref from node
-                if (ref) {
-                    if (typeof ref === 'function') {
-                        return ref(el);
-                    } else if (ref) {
-                        ref.current = el;
-                    }
-                }
-            }}
+        <rect ref={rectElement}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
             width={PORT_HEIGHT_WIDTH}
