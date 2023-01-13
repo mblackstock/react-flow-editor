@@ -6,9 +6,10 @@
  * @link https://stackoverflow.com/questions/53458053/how-to-handle-react-svg-drag-and-drop-with-react-hooks
  */
 
-import { useState, useRef, useCallback, useEffect } from "react";
 import * as registry from "../../services/registry";
 import { Port, PORT_HEIGHT_WIDTH } from "./Port";
+
+import { useState, useRef, useCallback, useEffect, forwardRef, useImperativeHandle } from "react";
 
 const PORT_MARGIN = 8;
 const PORT_SPACING = 4;
@@ -16,11 +17,23 @@ const NODE_WIDTH = 100;
 const ICON_WIDTH = 20; // left margin
 const RIGHT_MARGIN = 15;
 
-const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
+const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd }, ref) => {
 
     const textElement = useRef(null);
     const rectElement = useRef(null);
     const outputPorts = useRef([]);
+
+    useImperativeHandle(ref, () => {
+        return {
+          getPortPosition: (type, port) => {
+            const rectWidth = +rectElement.current.getAttribute('width');
+            // properties may not be out of date since we were dragged
+            const yPos = position.y + PORT_MARGIN + port * (PORT_HEIGHT_WIDTH + PORT_SPACING)+PORT_HEIGHT_WIDTH/2;
+            const xPos = position.x + (type === 'out' ? rectWidth:0);
+            return [xPos, yPos];
+          }
+        };
+      }, []);
 
     useEffect(() => {
         if (textElement.current === null)
@@ -88,7 +101,7 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
             setSelected(!selected);
         }
         document.removeEventListener('mousemove', handleMouseMove);
-        setPosition({ ...position, coords: {} })
+        setPosition({ ...position, coords: {} });
     }
 
     const onPortMouseUp = (e, type, port) => {
@@ -159,6 +172,6 @@ const Node = ({ id, x, y, type, wireStart, wireEnd }) => {
             {outputs}
         </g >);
 
-};
+});
 
 export default Node;
