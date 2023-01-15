@@ -33,15 +33,23 @@ const Editor = ({ flow }) => {
             setNodes(flow.nodes)
         }
 
-    }, [flow])
+    }, [flow]);
 
-    // useEffect(() => {
-    //     // tell the nodes about the wires they are hooked up to so they can move them
-    //     for (const wireElement of wireElements.current) {
-    //         nodeElements.current[wireElement.startNode].setOutWire(wireElement.el);
-    //         nodeElements.current[wireElement.endNode].setInWire(wireElement.el);
-    //     }
-    // }, [wires]);
+    useEffect(() => {
+        // nodeElements.current = {};
+        // for (const id in nodeElements.current) {
+        //     nodeElements.current[id].clearWires();
+        // }
+    }, [nodes])
+
+    useEffect(() => {
+
+        // tell the nodes about the wires they are hooked up to so they can move them
+        // for (const wireElement of wireElements.current) {
+        //     nodeElements.current[wireElement.startNode].setOutWire(wireElement.el);
+        //     nodeElements.current[wireElement.endNode].setInWire(wireElement.el);
+        // }
+    }, [nodes, wires]);
 
     // generate a unique node id
     const generateId = () => (Math.floor(1 + Math.random() * 4294967295)).toString(16);
@@ -69,6 +77,35 @@ const Editor = ({ flow }) => {
     const onDragOver = (e) => {
         // needed for drag to work
         e.preventDefault();
+    }
+
+    // moved a node
+
+    const nodeDragStart = (id) => {
+        // find the wires that are attached to the node for the drag
+        const outputWires = [];
+        const inputWires = [];
+        const nodeElement = nodeElements.current[id];
+        for (const wire of wireElements.current) {
+            if (wire.startNode === id)
+                outputWires.push(wire.el);
+            if (wire.endNode === id)
+                inputWires.push(wire.el);
+        }
+        nodeElement.setDragWires(inputWires, outputWires);
+    }
+
+    const nodeDragEnd = (id, x, y) => {
+        // update the node position
+        const nodeElement = nodeElements.current[id];
+        setNodes((nodes) => {
+            const newNodes = [...nodes];
+            const node = newNodes.find(node => node.id === id);
+            node.x = x; node.y = y;
+            return newNodes;
+        });
+        // clear the drag wires
+        nodeElement.clearDragWires();
     }
 
     // dragging the wire
@@ -140,13 +177,14 @@ const Editor = ({ flow }) => {
 
     // TODO:
 
-    /*
-    generate a list of wires.
-    need port locations, so probably best to move these to a helper service
-    */
-
     const nodeList = nodes.map((node) => (<Node
-        ref={(el) => nodeElements.current[node.id] = el}
+        ref={(el) => {
+            if (el === null) {
+                delete nodeElements.current[node.id];
+            } else {
+                nodeElements.current[node.id] = el;
+            }
+        }}
         key={node.id}
         id={node.id}
         x={node.x}
@@ -154,8 +192,11 @@ const Editor = ({ flow }) => {
         type={node.type}
         wireStart={wireStart}
         wireEnd={wireEnd}
+        dragStart={nodeDragStart}
+        dragEnd={nodeDragEnd}
     />));
 
+    wireElements.current = [];
     const wireList = wires.map((wire) => {
         // get the positions of ports to draw the wires
         let el = nodeElements.current[wire.startNode];
@@ -163,7 +204,9 @@ const Editor = ({ flow }) => {
         el = nodeElements.current[wire.endNode];
         const [x2, y2] = el.getPortPosition('in', wire.endPort);
         return <Wire
-            ref={(el) => wireElements.current.push({el:el, startNode: wire.startNode, endNode: wire.endNode})}
+            ref={(el) => {
+                el && wireElements.current.push({el:el, startNode: wire.startNode, endNode: wire.endNode});
+            }}
             key={`${wire.startNode}/${wire.startPort}-${wire.endNode}/${wire.endPort}`}
             hidden={false} x1={x1} y1={y1} x2={x2} y2={y2} />
     });

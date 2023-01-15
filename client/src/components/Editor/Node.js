@@ -17,7 +17,7 @@ const NODE_WIDTH = 100;
 const ICON_WIDTH = 20; // left margin
 const RIGHT_MARGIN = 15;
 
-const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd }, ref) => {
+const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd, dragStart, dragEnd }, ref) => {
 
     const textElement = useRef(null);
     const rectElement = useRef(null);
@@ -40,11 +40,13 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd }, ref) => {
             const xPos = position.x + (type === 'out' ? rectWidth:0);
             return [xPos, yPos];
           },
-          setOutWire: (el) => {
-            outWires.current.push(el);
+          clearDragWires: () => {
+            outWires.current = [];
+            inWires.current = [];
           },
-          setInWire: (el) => {
-            inWires.current.push(el);
+          setDragWires: (inputWires, outputWires) => {
+            inWires.current = inputWires;
+            outWires.current = outputWires;
           }
         };
       }, [position.x, position.y]);
@@ -77,16 +79,18 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd }, ref) => {
             const xDiff = position.coords.x - e.pageX;  // how far we moved
             const yDiff = position.coords.y - e.pageY;
 
+            const x = position.x - xDiff;
+            const y = position.y - yDiff;
             // side effect of updating one component while updating this one.
-            // for (const el of outWires.current) {
-            //     el.moveStart(xDiff, yDiff);
-            // }
-            // for (const el of inWires.current) {
-            //     el.moveEnd(xDiff, yDiff);
-            // }
+            for (const el of outWires.current) {
+                el.moveStart(x,y);
+            }
+            for (const el of inWires.current) {
+                el.moveEnd(x,y);
+            }
             return {
-                x: position.x - xDiff,                  // change group position by this amount
-                y: position.y - yDiff,
+                x,                  // change group position by this amount
+                y,
                 coords: {
                     x: e.pageX,
                     y: e.pageY,
@@ -107,6 +111,7 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd }, ref) => {
             },
         }));
         document.addEventListener('mousemove', handleMouseMove);
+        dragStart && dragStart(id);
     }
 
     const onMouseUp = (e) => {
@@ -116,6 +121,7 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd }, ref) => {
         }
         document.removeEventListener('mousemove', handleMouseMove);
         setPosition({ ...position, coords: {} });
+        dragEnd && dragEnd(id, position.x, position.y);
     }
 
     const onPortMouseUp = (e, type, port) => {
