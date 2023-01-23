@@ -42,10 +42,6 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd, dragStart, dragEn
             const xPos = position.x + (type === 'out' ? rectWidth:0);
             return [xPos, yPos];
           },
-          clearDragWires: () => {
-            outWires.current = [];
-            inWires.current = [];
-          },
           setDragWires: (inputWires, outputWires) => {
             inWires.current = inputWires;
             outWires.current = outputWires;

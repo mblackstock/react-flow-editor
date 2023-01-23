@@ -35,22 +35,6 @@ const Editor = ({ flow }) => {
 
     }, [flow]);
 
-    useEffect(() => {
-        // nodeElements.current = {};
-        // for (const id in nodeElements.current) {
-        //     nodeElements.current[id].clearWires();
-        // }
-    }, [nodes])
-
-    useEffect(() => {
-
-        // tell the nodes about the wires they are hooked up to so they can move them
-        // for (const wireElement of wireElements.current) {
-        //     nodeElements.current[wireElement.startNode].setOutWire(wireElement.el);
-        //     nodeElements.current[wireElement.endNode].setInWire(wireElement.el);
-        // }
-    }, [nodes, wires]);
-
     // generate a unique node id
     const generateId = () => (Math.floor(1 + Math.random() * 4294967295)).toString(16);
 
@@ -86,6 +70,7 @@ const Editor = ({ flow }) => {
         const outputWires = [];
         const inputWires = [];
         const nodeElement = nodeElements.current[id];
+        // find all of the rendered wires connected to the node for drag
         for (const wire of wireElements.current) {
             if (wire.startNode === id)
                 outputWires.push(wire.el);
@@ -96,16 +81,13 @@ const Editor = ({ flow }) => {
     }
 
     const nodeDragEnd = (id, x, y) => {
-        // update the node position
-        const nodeElement = nodeElements.current[id];
+        // update its position in our array
         setNodes((nodes) => {
             const newNodes = [...nodes];
             const node = newNodes.find(node => node.id === id);
             node.x = x; node.y = y;
             return newNodes;
         });
-        // clear the drag wires
-        nodeElement.clearDragWires();
     }
 
     // dragging the wire
