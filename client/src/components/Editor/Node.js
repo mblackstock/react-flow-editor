@@ -24,6 +24,8 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd, dragStart, dragEn
     const outputPorts = useRef([]);
     const outWires = useRef([]);
     const inWires = useRef([]);
+    // track drag start to get offsets of wires
+    const dragStartPosition = useRef({x,y});
 
     const [position, setPosition] = useState({
         x,
@@ -79,14 +81,16 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd, dragStart, dragEn
             const xDiff = position.coords.x - e.pageX;  // how far we moved
             const yDiff = position.coords.y - e.pageY;
 
+            // new position of the node
             const x = position.x - xDiff;
             const y = position.y - yDiff;
-            // side effect of updating one component while updating this one.
+
+            // move the wires as we drag, but don't rerender them.
             for (const el of outWires.current) {
-                el.moveStart(x,y);
+                el.moveStart(dragStartPosition.current.x-x,dragStartPosition.current.y-y);
             }
             for (const el of inWires.current) {
-                el.moveEnd(x,y);
+                el.moveEnd(dragStartPosition.current.x-x,dragStartPosition.current.y-y);
             }
             return {
                 x,                  // change group position by this amount
@@ -121,6 +125,8 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd, dragStart, dragEn
         }
         document.removeEventListener('mousemove', handleMouseMove);
         setPosition({ ...position, coords: {} });
+        dragStartPosition.current.x = position.x;
+        dragStartPosition.current.y = position.y;
         dragEnd && dragEnd(id, position.x, position.y);
     }
 
