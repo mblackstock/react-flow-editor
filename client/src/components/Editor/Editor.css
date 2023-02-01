@@ -1,35 +1,32 @@
 /* Editor */
 
-/* box around editor */
-
 .editor svg {
-    border: 1px solid black;
-  }
-  
-  
-  .editor-node {
-    fill: rgb(166, 187, 207);
-    stroke: #999;
-    cursor: move;
-    stroke-width: 2;
-  }
-  
-  .editor-node-selected {
-    stroke: #ff7f0e;
-    stroke-width: 3
-  }
-  
-  .editor-node-label {
-    fill: #000;
-    stroke: none;
-    cursor: move;
-    stroke-width: 1px;
-    fill: black;
-  }
-  
-  .wire {
-    stroke: #999;
-    stroke-width: 3;
-    fill: none;
-    cursor: crosshair
-  }
+  border: 1px solid black;
+}
+
+.editor-node {
+  fill: rgb(166, 187, 207);
+  stroke: #999;
+  cursor: move;
+  stroke-width: 2;
+}
+
+.editor-node-selected {
+  stroke: #ff7f0e;
+  stroke-width: 3
+}
+
+.editor-node-label {
+  fill: #000;
+  stroke: none;
+  cursor: move;
+  stroke-width: 1px;
+  fill: black;
+}
+
+.wire {
+  stroke: #999;
+  stroke-width: 3;
+  fill: none;
+  cursor: crosshair
+}

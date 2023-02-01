@@ -6,8 +6,12 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 const Editor = ({ flow }) => {
 
+    // const [, forceUpdate] = useReducer(x => x + 1, 0);
+
     // nodes, wires, tabs in current flow
-    const [nodes, setNodes] = useState([])
+    const [nodes, setNodes] = useState([]);
+    const [wires, setWires] = useState([]);
+
     const [dragWire, setDragWire] = useState({
         type: 'out',        // type of starting port
         startNode: '',      // start node id
@@ -22,17 +26,15 @@ const Editor = ({ flow }) => {
         y2: 0
     });
 
-    const [wires, setWires] = useState([]);
-
     const svgElement = useRef(null);
     const nodeElements = useRef({});
     const wireElements = useRef([]);
 
+    // load up the nodes provided
     useEffect(() => {
         if (flow?.nodes) {
             setNodes(flow.nodes)
         }
-
     }, [flow]);
 
     // generate a unique node id
@@ -41,11 +43,11 @@ const Editor = ({ flow }) => {
     const drop = (e) => {
         e.preventDefault();
         // note e.target.getBoundingClientRect() gets child element bounding box, not the svg!
-        var rect = e.currentTarget.getBoundingClientRect();
+        const rect = e.currentTarget.getBoundingClientRect();
         const nodeType = e.dataTransfer.getData("text");
         console.log(nodeType)
-        var x = e.clientX - rect.left; //x position within the element.
-        var y = e.clientY - rect.top;  //y position within the element.
+        const x = e.clientX - rect.left; //x position within the element.
+        const y = e.clientY - rect.top;  //y position within the element.
         // create a new node
         setNodes(nodes => {
             const newNode = {
@@ -64,7 +66,6 @@ const Editor = ({ flow }) => {
     }
 
     // moved a node
-
     const nodeDragStart = (id) => {
         // find the wires that are attached to the node for the drag
         const outputWires = [];
@@ -77,21 +78,25 @@ const Editor = ({ flow }) => {
             if (wire.endNode === id)
                 inputWires.push(wire.el);
         }
+        // tell the node component about wires connected during drag
         nodeElement.setDragWires(inputWires, outputWires);
     }
 
+    // when drag completed, update our node array state with position
     const nodeDragEnd = (id, x, y) => {
-        // update its position in our array
-        setNodes((nodes) => {
-            const newNodes = [...nodes];
-            const node = newNodes.find(node => node.id === id);
-            node.x = x; node.y = y;
-            return newNodes;
-        });
+        // setTimeout forces re-rendering later, otherwise wire
+        // rendering uses old node positions
+        setTimeout(() => {
+            setNodes((nodes) => {
+                const newNodes = [...nodes];
+                const node = newNodes.find(node => node.id === id);
+                node.x = x; node.y = y;
+                return newNodes;
+            });
+        },0);
     }
 
-    // dragging the wire
-
+    // dragging the wire between ports
     const handleWireMouseMove = useCallback((e) => {
         e.preventDefault();
         const rect = svgElement.current.getBoundingClientRect();
@@ -114,24 +119,30 @@ const Editor = ({ flow }) => {
         });
     }, []);
 
-    const handleMouseUp = useCallback((e) => {
-        // TODO: remove the drag wire and don't save since we didn't connect to 
-        // anything
+    const handleMouseUp = useCallback(() => {
         setDragWire({...dragWire, hidden: true});
         document.removeEventListener('mousemove', handleWireMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
-    });
+    },[dragWire, handleWireMouseMove]);
 
+    // port mouse down on this node
     const wireStart = (e, id, x, y, type, port) => {
-        console.log(`wire start ${e} ${id} ${type} ${port}`);
-        setDragWire({ type, startNode: id, startPort: port, hidden: false, x1: x, y1: y, x2: x, y2: y });
-        // TODO: save start wire
+        setDragWire({
+            type,
+            startNode: id,
+            startPort: port,
+            hidden: false,
+            x1: x,
+            y1: y,
+            x2: x,
+            y2: y
+        });
         document.addEventListener('mousemove', handleWireMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
     }
 
+    // port mouse up on this node
     const wireEnd = (e, id, type, port) => {
-        console.log(`wire end ${e} ${id} ${type} ${port}`);
         setDragWire({...dragWire, hidden: true});
         document.removeEventListener('mousemove', handleWireMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -154,10 +165,6 @@ const Editor = ({ flow }) => {
         }
         setWires([...wires, newWire]);
     }
-
-    // --end
-
-    // TODO:
 
     const nodeList = nodes.map((node) => (<Node
         ref={(el) => {
@@ -192,6 +199,7 @@ const Editor = ({ flow }) => {
             key={`${wire.startNode}/${wire.startPort}-${wire.endNode}/${wire.endPort}`}
             hidden={false} x1={x1} y1={y1} x2={x2} y2={y2} />
     });
+    
 
     return (
         <div className="editor" >

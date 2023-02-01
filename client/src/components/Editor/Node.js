@@ -37,7 +37,6 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd, dragStart, dragEn
         return {
           getPortPosition: (type, port) => {
             const rectWidth = +rectElement.current.getAttribute('width');
-            // properties may not be out of date since we were dragged
             const yPos = position.y + PORT_MARGIN + port * (PORT_HEIGHT_WIDTH + PORT_SPACING)+PORT_HEIGHT_WIDTH/2;
             const xPos = position.x + (type === 'out' ? rectWidth:0);
             return [xPos, yPos];
@@ -120,7 +119,9 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd, dragStart, dragEn
             setSelected(!selected);
         }
         document.removeEventListener('mousemove', handleMouseMove);
-        setPosition({ ...position, coords: {} });
+        setPosition(position => {
+            return { ...position, coords: {} };
+        });
         dragStartPosition.current.x = position.x;
         dragStartPosition.current.y = position.y;
         dragEnd && dragEnd(id, position.x, position.y);
