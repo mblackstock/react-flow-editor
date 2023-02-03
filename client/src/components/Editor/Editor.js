@@ -45,7 +45,6 @@ const Editor = ({ flow }) => {
         // note e.target.getBoundingClientRect() gets child element bounding box, not the svg!
         const rect = e.currentTarget.getBoundingClientRect();
         const nodeType = e.dataTransfer.getData("text");
-        console.log(nodeType)
         const x = e.clientX - rect.left; //x position within the element.
         const y = e.clientY - rect.top;  //y position within the element.
         // create a new node
@@ -125,12 +124,22 @@ const Editor = ({ flow }) => {
         });
     }, []);
 
+    const handleMouseDown = useCallback(() => {
+        console.log('mousedown');
+        setNodes((nodes) => {
+            return nodes.map((node) => {
+                node.selected = false;
+                return node;
+            });
+        })
+    },[]);
+
     const handleMouseUp = useCallback(() => {
         setDragWire({...dragWire, hidden: true});
         document.removeEventListener('mousemove', handleWireMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
     },[dragWire, handleWireMouseMove]);
-
+    
     // port mouse down on this node
     const wireStart = (id, x, y, type, port) => {
         setDragWire({
@@ -233,7 +242,8 @@ const Editor = ({ flow }) => {
             <svg ref={svgElement} width="1000px" height="1000px"
                 shapeRendering="geometricPrecision"
                 onDrop={drop}
-                onDragOver={onDragOver}>
+                onDragOver={onDragOver}
+                onMouseDown={handleMouseDown}>
                 <Wire hidden={dragWire.hidden}
                     x1={dragWire.x1}
                     y1={dragWire.y1}

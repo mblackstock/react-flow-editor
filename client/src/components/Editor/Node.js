@@ -65,6 +65,7 @@ const Node = forwardRef(({ id, x, y, type, selected, wireStart, wireEnd, dragSta
     }, []);
 
     const onMouseDown = (e) => {
+        e.stopPropagation();
         // assume we are not dragging until we get a mouse move event
         isDrag.current = false;
 
@@ -139,7 +140,6 @@ const Node = forwardRef(({ id, x, y, type, selected, wireStart, wireEnd, dragSta
     }
 
     const onPortMouseUp = (e, type, port) => {
-        console.log(`port mouse up${type} ${port}`);
         wireEnd(e, id, type, port);
     }
 

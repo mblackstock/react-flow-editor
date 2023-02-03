@@ -19,7 +19,6 @@ export const Port = forwardRef(({ x, y, type, port, mouseDown, mouseUp }, ref) =
 
     const handleMouseDown = (e) => {
         e.preventDefault();
-        console.log(rectElement.current);
         // get x and y that may have moved
         x = +rectElement.current.getAttribute("x") + PORT_HEIGHT_WIDTH / 2
         y = +rectElement.current.getAttribute("y") + PORT_HEIGHT_WIDTH / 2
