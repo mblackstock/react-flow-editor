@@ -172,16 +172,21 @@ const Editor = ({ flow }) => {
         setWires([...wires, newWire]);
     }
 
-    const nodeClick = (id) => {
-        console.log(`click ${id}`);
+    const nodeClick = (e, id) => {
         setNodes((nodes) => {
-            return changeNode(nodes, id, (node) => {
-                node.selected = true;
+            return nodes.map( (node) => {
+                if (!e.shiftKey && node.id !== id) {
+                    node.selected = false;
+                }
+                if (node.id === id) {
+                    node.selected = true;
+                }
+                return node;
             });
         });
     }
 
-    const doubleClick = (id) => {
+    const doubleClick = (e, id) => {
         console.log(`doubleClick ${id}`);
     }
 

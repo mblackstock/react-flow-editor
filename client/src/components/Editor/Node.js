@@ -118,16 +118,16 @@ const Node = forwardRef(({ id, x, y, type, selected, wireStart, wireEnd, dragSta
             clickCount.current = clickCount.current+1;
             // if we're here in time, we have a double click
             if (clickCount.current > 1) {
-                doubleClick(id);
+                doubleClick(e, id);
             }   
             setTimeout(() => {
                 // time has passed, but no second click
                 if (clickCount.current === 1) {
-                    click(id);
+                    click(e, id);
                 }
                 // clear possibility of second click
                 clickCount.current = 0;
-            }, 200);
+            }, 100);
         }
         document.removeEventListener('mousemove', handleMouseMove);
         setPosition(position => {
