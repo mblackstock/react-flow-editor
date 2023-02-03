@@ -17,15 +17,16 @@ const NODE_WIDTH = 100;
 const ICON_WIDTH = 20; // left margin
 const RIGHT_MARGIN = 15;
 
-const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd, dragStart, dragEnd }, ref) => {
+const Node = forwardRef(({ id, x, y, type, selected, wireStart, wireEnd, dragStart, dragEnd, click, doubleClick }, ref) => {
 
     const textElement = useRef(null);
     const rectElement = useRef(null);
     const outputPorts = useRef([]);
     const outWires = useRef([]);
     const inWires = useRef([]);
-    // track drag start to get offsets of wires
-    const dragStartPosition = useRef({x,y});
+    const dragStartPosition = useRef({x,y}); // track drag start to get offsets of wires
+    const isDrag = useRef(false);           // is dragging vs. clicking
+    const clickCount = useRef(0);
 
     const [position, setPosition] = useState({
         x,
@@ -63,8 +64,21 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd, dragStart, dragEn
 
     }, []);
 
-    const isDrag = useRef(false)
-    const [selected, setSelected] = useState(false);
+    const onMouseDown = (e) => {
+        // assume we are not dragging until we get a mouse move event
+        isDrag.current = false;
+
+        const pageX = e.pageX;
+        const pageY = e.pageY;
+        setPosition(position => Object.assign({}, position, {
+            coords: {
+                x: pageX,           // where we started
+                y: pageY,
+            },
+        }));
+        document.addEventListener('mousemove', handleMouseMove);
+        dragStart && dragStart(id);
+    }
 
     // Use useCallback to create the function once and hold a reference to it.  Otherwise
     // a different function is created every time its rendered
@@ -98,25 +112,22 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd, dragStart, dragEn
         });
     }, []);
 
-    const onMouseDown = (e) => {
-        // assume we are not dragging until we get a mouse move event
-        isDrag.current = false;
-        const pageX = e.pageX;
-        const pageY = e.pageY;
-        setPosition(position => Object.assign({}, position, {
-            coords: {
-                x: pageX,           // where we started
-                y: pageY,
-            },
-        }));
-        document.addEventListener('mousemove', handleMouseMove);
-        dragStart && dragStart(id);
-    }
-
     const onMouseUp = (e) => {
-        // toggle selected if we didn't move
+        // fire click or double click if we didn't move
         if (!isDrag.current) {
-            setSelected(!selected);
+            clickCount.current = clickCount.current+1;
+            // if we're here in time, we have a double click
+            if (clickCount.current > 1) {
+                doubleClick(id);
+            }   
+            setTimeout(() => {
+                // time has passed, but no second click
+                if (clickCount.current === 1) {
+                    click(id);
+                }
+                // clear possibility of second click
+                clickCount.current = 0;
+            }, 200);
         }
         document.removeEventListener('mousemove', handleMouseMove);
         setPosition(position => {
@@ -132,12 +143,11 @@ const Node = forwardRef(({ id, x, y, type, wireStart, wireEnd, dragStart, dragEn
         wireEnd(e, id, type, port);
     }
 
-    const onPortMouseDown = (e, portX, portY, type, port) => {
-        console.log(`port mouse down ${type} ${port}`);
+    const onPortMouseDown = (portX, portY, type, port) => {
         // position of port is node position + port position
         let wireX = position.x + portX;
         let wireY = position.y + portY;
-        wireStart(e, id, wireX, wireY, type, port);
+        wireStart(id, wireX, wireY, type, port);
     }
 
     // TODO: from registry, create flow node entry

@@ -82,16 +82,22 @@ const Editor = ({ flow }) => {
         nodeElement.setDragWires(inputWires, outputWires);
     }
 
+    const changeNode = (nodes, id, change) => {
+        const newNodes = [...nodes];
+        const node = newNodes.find(node => node.id === id);
+        change(node);
+        return newNodes;
+    }
+
     // when drag completed, update our node array state with position
     const nodeDragEnd = (id, x, y) => {
         // setTimeout forces re-rendering later, otherwise wire
         // rendering uses old node positions
         setTimeout(() => {
             setNodes((nodes) => {
-                const newNodes = [...nodes];
-                const node = newNodes.find(node => node.id === id);
-                node.x = x; node.y = y;
-                return newNodes;
+                return changeNode(nodes, id, (node) => {
+                    node.x = x; node.y = y;
+                });
             });
         },0);
     }
@@ -126,7 +132,7 @@ const Editor = ({ flow }) => {
     },[dragWire, handleWireMouseMove]);
 
     // port mouse down on this node
-    const wireStart = (e, id, x, y, type, port) => {
+    const wireStart = (id, x, y, type, port) => {
         setDragWire({
             type,
             startNode: id,
@@ -166,6 +172,19 @@ const Editor = ({ flow }) => {
         setWires([...wires, newWire]);
     }
 
+    const nodeClick = (id) => {
+        console.log(`click ${id}`);
+        setNodes((nodes) => {
+            return changeNode(nodes, id, (node) => {
+                node.selected = true;
+            });
+        });
+    }
+
+    const doubleClick = (id) => {
+        console.log(`doubleClick ${id}`);
+    }
+
     const nodeList = nodes.map((node) => (<Node
         ref={(el) => {
             if (el === null) {
@@ -179,10 +198,13 @@ const Editor = ({ flow }) => {
         x={node.x}
         y={node.y}
         type={node.type}
+        selected={node.selected?true:false}
         wireStart={wireStart}
         wireEnd={wireEnd}
         dragStart={nodeDragStart}
         dragEnd={nodeDragEnd}
+        click={nodeClick}
+        doubleClick={doubleClick}
     />));
 
     wireElements.current = [];
