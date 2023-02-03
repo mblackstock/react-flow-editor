@@ -12,13 +12,19 @@ const Editor = ({ flow }) => {
     const [nodes, setNodes] = useState([]);
     const [wires, setWires] = useState([]);
 
+    /* wire schema:
+    startNode: '',      // start node id
+    startPort:0,        // start port number
+    endNode: '',
+    endPort: 0,
+    */
     const [dragWire, setDragWire] = useState({
         type: 'out',        // type of starting port
         startNode: '',      // start node id
-        startPort:0,        // start port number
+        startPort: 0,        // start port number
         endNode: '',
         endPort: 0,
-    
+
         hidden: true,
         x1: 0,
         y1: 0,
@@ -37,6 +43,24 @@ const Editor = ({ flow }) => {
         }
     }, [flow]);
 
+    const deleteFunction = useCallback((e) => {
+        if (e.key === "Delete") {
+            const selectedNodes = nodes.filter(node => node.selected ? true : false).map(node=>node.id);
+            setWires(wires => wires.filter(wire => {
+                return !(selectedNodes.includes(wire.startNode) || selectedNodes.includes(wire.endNode));
+            }))
+            setNodes((nodes) => nodes.filter((node) => !node.selected));
+        }
+    }, [nodes]);
+
+    useEffect(() => {
+        document.addEventListener("keydown", deleteFunction, false);
+
+        return () => {
+            document.removeEventListener("keydown", deleteFunction, false);
+        };
+    }, [deleteFunction]);
+
     // generate a unique node id
     const generateId = () => (Math.floor(1 + Math.random() * 4294967295)).toString(16);
 
@@ -52,7 +76,7 @@ const Editor = ({ flow }) => {
             const newNode = {
                 id: generateId(),
                 type: nodeType,
-                x:x-50, y:y-15  // TODO: place it in the canvas more centered - figure out offsets?
+                x: x - 50, y: y - 15  // TODO: place it in the canvas more centered - figure out offsets?
             }
             // add element there
             return [...nodes, newNode];
@@ -81,24 +105,18 @@ const Editor = ({ flow }) => {
         nodeElement.setDragWires(inputWires, outputWires);
     }
 
-    const changeNode = (nodes, id, change) => {
-        const newNodes = [...nodes];
-        const node = newNodes.find(node => node.id === id);
-        change(node);
-        return newNodes;
-    }
-
     // when drag completed, update our node array state with position
     const nodeDragEnd = (id, x, y) => {
         // setTimeout forces re-rendering later, otherwise wire
         // rendering uses old node positions
         setTimeout(() => {
             setNodes((nodes) => {
-                return changeNode(nodes, id, (node) => {
-                    node.x = x; node.y = y;
-                });
+                const newNodes = [...nodes];
+                const node = newNodes.find(node => node.id === id);
+                node.x = x; node.y = y;
+                return newNodes;
             });
-        },0);
+        }, 0);
     }
 
     // dragging the wire between ports
@@ -108,7 +126,7 @@ const Editor = ({ flow }) => {
         const x = e.clientX - rect.left; //x position within the element.
         const y = e.clientY - rect.top;  //y position within the element.
         setDragWire(dragWire => {
-            const newDragWire = {...dragWire};
+            const newDragWire = { ...dragWire };
             if (dragWire.type === 'out') {
                 newDragWire.x1 = dragWire.x1;
                 newDragWire.y1 = dragWire.y1;
@@ -124,22 +142,22 @@ const Editor = ({ flow }) => {
         });
     }, []);
 
+    // deselect all nodes if we click on the canvas
     const handleMouseDown = useCallback(() => {
-        console.log('mousedown');
         setNodes((nodes) => {
             return nodes.map((node) => {
                 node.selected = false;
                 return node;
             });
         })
-    },[]);
+    }, []);
 
     const handleMouseUp = useCallback(() => {
-        setDragWire({...dragWire, hidden: true});
+        setDragWire({ ...dragWire, hidden: true });
         document.removeEventListener('mousemove', handleWireMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
-    },[dragWire, handleWireMouseMove]);
-    
+    }, [dragWire, handleWireMouseMove]);
+
     // port mouse down on this node
     const wireStart = (id, x, y, type, port) => {
         setDragWire({
@@ -158,7 +176,7 @@ const Editor = ({ flow }) => {
 
     // port mouse up on this node
     const wireEnd = (e, id, type, port) => {
-        setDragWire({...dragWire, hidden: true});
+        setDragWire({ ...dragWire, hidden: true });
         document.removeEventListener('mousemove', handleWireMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
 
@@ -183,7 +201,7 @@ const Editor = ({ flow }) => {
 
     const nodeClick = (e, id) => {
         setNodes((nodes) => {
-            return nodes.map( (node) => {
+            return nodes.map((node) => {
                 if (!e.shiftKey && node.id !== id) {
                     node.selected = false;
                 }
@@ -212,7 +230,7 @@ const Editor = ({ flow }) => {
         x={node.x}
         y={node.y}
         type={node.type}
-        selected={node.selected?true:false}
+        selected={node.selected ? true : false}
         wireStart={wireStart}
         wireEnd={wireEnd}
         dragStart={nodeDragStart}
@@ -230,12 +248,12 @@ const Editor = ({ flow }) => {
         const [x2, y2] = el.getPortPosition('in', wire.endPort);
         return <Wire
             ref={(el) => {
-                el && wireElements.current.push({el:el, startNode: wire.startNode, endNode: wire.endNode});
+                el && wireElements.current.push({ el: el, startNode: wire.startNode, endNode: wire.endNode });
             }}
             key={`${wire.startNode}/${wire.startPort}-${wire.endNode}/${wire.endPort}`}
             hidden={false} x1={x1} y1={y1} x2={x2} y2={y2} />
     });
-    
+
 
     return (
         <div className="editor" >
