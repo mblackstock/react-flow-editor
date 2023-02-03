@@ -13,11 +13,20 @@ const Editor = ({ flow }) => {
     const [wires, setWires] = useState([]);
 
     /* wire schema:
-    startNode: '',      // start node id
-    startPort:0,        // start port number
-    endNode: '',
-    endPort: 0,
+        selected: false,
+        startNode: '',      // start node id
+        startPort:0,        // start port number
+        endNode: '',
+        endPort: 0,
     */
+
+    /* node schema
+        selected: false,
+        id: generateId(),
+        type: nodeType,
+        x: x - 50, y: y - 15  // TODO: place it in the canvas more centered - figure out offsets?
+    */
+
     const [dragWire, setDragWire] = useState({
         type: 'out',        // type of starting port
         startNode: '',      // start node id
@@ -45,7 +54,7 @@ const Editor = ({ flow }) => {
 
     const deleteFunction = useCallback((e) => {
         if (e.key === "Delete") {
-            const selectedNodes = nodes.filter(node => node.selected ? true : false).map(node=>node.id);
+            const selectedNodes = nodes.filter(node => node.selected).map(node=>node.id);
             setWires(wires => wires.filter(wire => {
                 return !(selectedNodes.includes(wire.startNode) || selectedNodes.includes(wire.endNode));
             }))
@@ -74,6 +83,7 @@ const Editor = ({ flow }) => {
         // create a new node
         setNodes(nodes => {
             const newNode = {
+                selected: false,
                 id: generateId(),
                 type: nodeType,
                 x: x - 50, y: y - 15  // TODO: place it in the canvas more centered - figure out offsets?
@@ -149,7 +159,13 @@ const Editor = ({ flow }) => {
                 node.selected = false;
                 return node;
             });
-        })
+        });
+        setWires((wires) => {
+            return wires.map((wire) => {
+                wire.selected = false;
+                return wire;
+            });
+        });
     }, []);
 
     const handleMouseUp = useCallback(() => {
@@ -184,7 +200,7 @@ const Editor = ({ flow }) => {
         if (type === dragWire.type) return;
 
         // add the new wire to our state to be draw in rendering
-        const newWire = {};
+        const newWire = {selected:false};
         if (dragWire.type === 'out') {
             newWire.startNode = dragWire.startNode;
             newWire.startPort = dragWire.startPort;
@@ -196,6 +212,7 @@ const Editor = ({ flow }) => {
             newWire.startNode = id;
             newWire.startPort = port;
         }
+        newWire.id=`${newWire.startNode}-${newWire.startPort}-${newWire.endNode}-${newWire.endPort}`
         setWires([...wires, newWire]);
     }
 
@@ -217,6 +234,21 @@ const Editor = ({ flow }) => {
         console.log(`doubleClick ${id}`);
     }
 
+    const wireClick = (e, id) => {
+        console.log(`wireClick`);
+        setWires((wires) => {
+            return wires.map((wire) => {
+                if (!e.shiftKey && wire.id !== id) {
+                    wire.selected = false;
+                }
+                if (wire.id === id) {
+                    wire.selected = true;
+                }
+                return wire;
+            });
+        });
+    }
+
     const nodeList = nodes.map((node) => (<Node
         ref={(el) => {
             if (el === null) {
@@ -230,7 +262,7 @@ const Editor = ({ flow }) => {
         x={node.x}
         y={node.y}
         type={node.type}
-        selected={node.selected ? true : false}
+        selected={node.selected}
         wireStart={wireStart}
         wireEnd={wireEnd}
         dragStart={nodeDragStart}
@@ -250,8 +282,11 @@ const Editor = ({ flow }) => {
             ref={(el) => {
                 el && wireElements.current.push({ el: el, startNode: wire.startNode, endNode: wire.endNode });
             }}
-            key={`${wire.startNode}/${wire.startPort}-${wire.endNode}/${wire.endPort}`}
-            hidden={false} x1={x1} y1={y1} x2={x2} y2={y2} />
+            id={wire.id}
+            key={wire.id}
+            hidden={false} x1={x1} y1={y1} x2={x2} y2={y2}
+            selected={wire.selected}
+            click={wireClick} />
     });
 
 

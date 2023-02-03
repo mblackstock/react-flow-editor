@@ -1,7 +1,7 @@
 import {useRef, forwardRef, useImperativeHandle } from "react";
 
 
-const Wire = forwardRef(({hidden, x1, y1, x2, y2, click}, ref) => {
+const Wire = forwardRef(({id, hidden, x1, y1, x2, y2, selected, click}, ref) => {
     
     const pathRef = useRef(null);
 
@@ -19,10 +19,15 @@ const Wire = forwardRef(({hidden, x1, y1, x2, y2, click}, ref) => {
         };
       },[x1, x2, y1, y2]);
 
+    const handleOnClick = (e) => {
+        e.stopPropagation();
+        click(e, id);
+    }
+
     return (
         <path ref={pathRef}
-            click={click}
-            className={`wire ${hidden ? 'hidden':'' }`}
+            onClick={handleOnClick}
+            className={`wire ${hidden ? 'hidden':'' } ${selected ? 'editor-selected' : ''}`}
             d={`M ${x1} ${y1} C ${x1+50} ${y1}, ${x2-50} ${y2}, ${x2}, ${y2}`}/>
         )
 });

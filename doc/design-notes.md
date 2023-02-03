@@ -25,8 +25,6 @@ https://stackoverflow.com/questions/53458053/how-to-handle-react-svg-drag-and-dr
 
 
 Next steps
-- decide on data structure for flows (similar to Node-RED or?)
-- add connectors
-- add registry service
+- select and deselect wires
 
 

@@ -192,7 +192,7 @@ const Node = forwardRef(({ id, x, y, type, selected, wireStart, wireEnd, dragSta
     // note that we add mousdown/up events to sub elements.  If we add it to the group
     // then the ports don't get events.
     return (
-        <g className={`editor-node ${selected ? 'editor-node-selected' : ''}`}
+        <g className={`editor-node ${selected ? 'editor-selected' : ''}`}
             transform={`translate(${position.x} ${position.y})`}>
             <rect ref={rectElement} width={NODE_WIDTH} height={nodeHeight} rx="5" ry="5"
                 onMouseDown={onMouseDown}

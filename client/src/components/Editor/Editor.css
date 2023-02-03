@@ -11,11 +11,6 @@
   stroke-width: 2;
 }
 
-.editor-node-selected {
-  stroke: #ff7f0e;
-  stroke-width: 3
-}
-
 .editor-node-label {
   fill: #000;
   stroke: none;
@@ -29,4 +24,9 @@
   stroke-width: 3;
   fill: none;
   cursor: crosshair
+}
+
+.editor-selected {
+  stroke: #ff7f0e;
+  stroke-width: 3
 }
