@@ -22,9 +22,13 @@ const Wire = forwardRef(({ id, hidden, x1, y1, x2, y2, selected, click }, ref) =
     e.stopPropagation();
     click(e, id);
   }
+  const handleOnMouseDown = (e) => {
+    e.stopPropagation();
+  }
 
   return (
     <path ref={pathRef}
+      onMouseDown={handleOnMouseDown}
       onClick={handleOnClick}
       className={`wire ${hidden ? 'hidden' : ''} ${selected ? 'editor-selected' : ''}`}
       d={`M ${x1} ${y1} C ${x1 + 50} ${y1}, ${x2 - 50} ${y2}, ${x2}, ${y2}`} />

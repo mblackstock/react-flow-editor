@@ -53,12 +53,17 @@ const Editor = ({ flow }) => {
   const deleteFunction = useCallback((e) => {
     if (e.key === "Delete") {
       const selectedNodes = nodes.filter(node => node.selected).map(node => node.id);
+      const selectedWires = wires.filter(wire => wire.selected).map(wire => wire.id);
+
       setWires(wires => wires.filter(wire => {
-        return !(selectedNodes.includes(wire.startNode) || selectedNodes.includes(wire.endNode));
+        // return true to keep wire if it is not connected to a deleted node AND not selected
+        let notConnectedWire = !(selectedNodes.includes(wire.startNode) || selectedNodes.includes(wire.endNode));
+        let notSelectedWire = !selectedWires.includes(wire.id);
+        return notSelectedWire && notConnectedWire;
       }))
       setNodes((nodes) => nodes.filter((node) => !node.selected));
     }
-  }, [nodes]);
+  }, [nodes, wires]);
 
   useEffect(() => {
     document.addEventListener("keydown", deleteFunction, false);
@@ -240,7 +245,7 @@ const Editor = ({ flow }) => {
   }
 
   const nodeClick = (e, id) => {
-    setNodes((nodes) => {
+    setNodes(nodes => {
       return nodes.map((node) => {
         if (!e.shiftKey && node.id !== id) {
           node.selected = false;
@@ -252,14 +257,14 @@ const Editor = ({ flow }) => {
       });
     });
   }
-
+  
   const doubleClick = (e, id) => {
     console.log(`doubleClick ${id}`);
     // TODO: open up config dialog for the node
   }
 
   const wireClick = (e, id) => {
-    setWires((wires) => {
+    setWires(wires => {
       return wires.map((wire) => {
         if (!e.shiftKey && wire.id !== id) {
           wire.selected = false;
@@ -269,8 +274,8 @@ const Editor = ({ flow }) => {
         }
         return wire;
       });
-    });
-  }
+    })
+  };
 
   const nodeList = nodes.map((node) => (<Node
     ref={(el) => {
