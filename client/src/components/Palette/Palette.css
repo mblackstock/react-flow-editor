@@ -1,40 +1,39 @@
-
 .palette-node {
-    cursor: move;
-    background: rgb(222, 222, 222);
-    margin: 10px auto;
-    height: 25px;
-    border-radius: 5px;
-    border: 1px solid #999;
-  
-    width: 120px;
-    position: relative;
-  
-    background-position: 5% 50%; 
-    background-repeat: no-repeat;
-    background-size: contain;
-  }
-  
-  .palette-node-label {
-    color: #333;
-    font-size: 13px;
-    margin: 2px 0 4px 32px;
-    line-height: 20px;
-    overflow: hidden;
-    user-select: none;
-  }
-  
-  .palette-port {
-    width: 8px;
-    height: 8px;
-    top: 8px;
-    left: -5px;
-    border: 1px solid #999;
-    border-radius: 2px;
-    position: absolute;
-    background-color: #EEE;
-  }
-  
-  .palette-port-output {
-    left: 115px;
-  }
+  cursor: move;
+  background: rgb(222, 222, 222);
+  margin: 10px auto;
+  height: 25px;
+  border-radius: 5px;
+  border: 1px solid #999;
+
+  width: 120px;
+  position: relative;
+
+  background-position: 5% 50%;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.palette-node-label {
+  color: #333;
+  font-size: 13px;
+  margin: 2px 0 4px 32px;
+  line-height: 20px;
+  overflow: hidden;
+  user-select: none;
+}
+
+.palette-port {
+  width: 8px;
+  height: 8px;
+  top: 8px;
+  left: -5px;
+  border: 1px solid #999;
+  border-radius: 2px;
+  position: absolute;
+  background-color: #EEE;
+}
+
+.palette-port-output {
+  left: 115px;
+}

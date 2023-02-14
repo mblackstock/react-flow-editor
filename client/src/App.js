@@ -41,7 +41,7 @@ function App() {
         <div className="panel">
           <div className="panel-header">Palette</div>
           <div className="panel-body">
-            <Palette nodes={nodes}/>
+            <Palette nodes={nodes} />
           </div>
         </div>
       </div>
@@ -49,7 +49,7 @@ function App() {
         <div className="panel">
           <div className="panel-header">Editor</div>
           <div className="panel-body">
-            <Editor flow={flow}/>
+            <Editor flow={flow} />
           </div>
         </div>
       </div>
