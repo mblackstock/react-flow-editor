@@ -34,12 +34,13 @@ const Node = forwardRef(({ id, x, y, type, selected, wireStart, wireEnd, dragSta
     coords: {},
   });
 
+  const [width, setWidth] = useState(NODE_WIDTH);
+
   useImperativeHandle(ref, () => {
     return {
       getPortPosition: (type, port) => {
-        const rectWidth = +rectElement.current.getAttribute('width');
         const yPos = position.y + PORT_MARGIN + port * (PORT_HEIGHT_WIDTH + PORT_SPACING) + PORT_HEIGHT_WIDTH / 2;
-        const xPos = position.x + (type === 'out' ? rectWidth : 0);
+        const xPos = position.x + (type === 'out' ? width : 0);
         return [xPos, yPos];
       },
       setDragWires: (inputWires, outputWires) => {
@@ -47,22 +48,16 @@ const Node = forwardRef(({ id, x, y, type, selected, wireStart, wireEnd, dragSta
         outWires.current = outputWires;
       }
     };
-  }, [position.x, position.y]);
+  }, [width, position.x, position.y]);
 
   useEffect(() => {
     if (textElement.current === null)
       return;
-
     // adjust width of node based on label
     const rectWidth = textElement.current.getComputedTextLength() + ICON_WIDTH + RIGHT_MARGIN;
-    rectElement.current.setAttribute("width", rectWidth);
+    setWidth(rectWidth);
 
-    // move the output ports in position after resize
-    for (const port of outputPorts.current) {
-      port.setX(rectWidth - PORT_HEIGHT_WIDTH / 2)
-    }
-
-  }, []);
+  }, [width]);
 
   const onMouseDown = (e) => {
     e.stopPropagation();
@@ -96,6 +91,7 @@ const Node = forwardRef(({ id, x, y, type, selected, wireStart, wireEnd, dragSta
       const y = position.y - yDiff;
 
       // move the wires as we drag, but don't rerender them.
+      // TODO: should this be moved to the editor and we have a monitor callback?
       for (const el of outWires.current) {
         el.moveStart(dragStartPosition.current.x - x, dragStartPosition.current.y - y);
       }
@@ -179,7 +175,7 @@ const Node = forwardRef(({ id, x, y, type, selected, wireStart, wireEnd, dragSta
     outputs.push(<Port
       key={key}
       ref={(el) => el && outputPorts.current.push(el)}
-      x={NODE_WIDTH - PORT_HEIGHT_WIDTH / 2}
+      x={width - PORT_HEIGHT_WIDTH / 2}
       y={yPos}
       type='out'
       port={i}
@@ -194,7 +190,7 @@ const Node = forwardRef(({ id, x, y, type, selected, wireStart, wireEnd, dragSta
   return (
     <g className={`editor-node ${selected ? 'editor-selected' : ''}`}
       transform={`translate(${position.x} ${position.y})`}>
-      <rect ref={rectElement} width={NODE_WIDTH} height={nodeHeight} rx="5" ry="5"
+      <rect ref={rectElement} width={width} height={nodeHeight} rx="5" ry="5"
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp} />
       <text ref={textElement} className="editor-node-label" x="20" y="18"

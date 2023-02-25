@@ -27,4 +27,6 @@ https://stackoverflow.com/questions/53458053/how-to-handle-react-svg-drag-and-dr
 Next steps
 - select and deselect wires
 
+Move to react-dnd instead of current rev to get rid of hacky drag and drop thing.
+
 
