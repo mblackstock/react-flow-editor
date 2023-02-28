@@ -1,3 +1,4 @@
+import { useDrop } from 'react-dnd'
 import Node from "./Node";
 import Wire from "./Wire"
 import "./Editor.css";
@@ -5,6 +6,38 @@ import "./Editor.css";
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 const Editor = ({ flow }) => {
+
+  const boundingBox = useRef(null);
+
+  const [{ canDrop, isOver }, dropTarget] = useDrop(() => ({
+    // The type (or types) to accept - strings or symbols
+    accept: 'PaletteNode',
+    // Props to collect
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop()
+    }),
+    drop: (item, monitor) => {
+      console.log(item.type);
+      const clientOffset = monitor.getClientOffset();
+      const sourceOffset = monitor.getInitialClientOffset();
+      console.log(sourceOffset);
+      const x = clientOffset.x - boundingBox.current.left; //x position within the element.
+      const y = clientOffset.y - boundingBox.current.top;  //y position within the element.
+
+      // create a new node
+      setNodes(nodes => {
+        const newNode = {
+          selected: false,
+          id: generateId(),
+          type: item.type,
+          x, y
+        }
+        // add element there
+        return [...nodes, newNode];
+      });
+    }
+  }))
 
   // nodes, wires, tabs in current flow
   const [nodes, setNodes] = useState([]);
@@ -39,7 +72,6 @@ const Editor = ({ flow }) => {
     y2: 0
   });
 
-  const svgElement = useRef(null);
   const nodeElements = useRef({});
   const wireElements = useRef([]);
 
@@ -75,27 +107,6 @@ const Editor = ({ flow }) => {
 
   /** Generate a unique node id */
   const generateId = () => (Math.floor(1 + Math.random() * 4294967295)).toString(16);
-
-  /** Drop handler */
-  const drop = (e) => {
-    e.preventDefault();
-    // note e.target.getBoundingClientRect() gets child element bounding box, not the svg!
-    const rect = e.currentTarget.getBoundingClientRect();
-    const nodeType = e.dataTransfer.getData("text");
-    const x = e.clientX - rect.left; //x position within the element.
-    const y = e.clientY - rect.top;  //y position within the element.
-    // create a new node
-    setNodes(nodes => {
-      const newNode = {
-        selected: false,
-        id: generateId(),
-        type: nodeType,
-        x: x - 50, y: y - 15  // TODO: place it in the canvas more centered - figure out offsets?
-      }
-      // add element there
-      return [...nodes, newNode];
-    });
-  };
 
   const onDragOver = (e) => {
     // needed for drag to work
@@ -144,9 +155,9 @@ const Editor = ({ flow }) => {
   // dragging the wire between ports
   const handleWireMouseMove = useCallback((e) => {
     e.preventDefault();
-    const rect = svgElement.current.getBoundingClientRect();
-    const x = e.clientX - rect.left; //x position within the element.
-    const y = e.clientY - rect.top;  //y position within the element.
+    // const rect = dropTarget.current.getBoundingClientRect();
+    const x = e.clientX - boundingBox.current.left; //x position within the element.
+    const y = e.clientY - boundingBox.current.top;  //y position within the element.
     setDragWire(dragWire => {
       const newDragWire = { ...dragWire };
       if (dragWire.type === 'out') {
@@ -257,7 +268,7 @@ const Editor = ({ flow }) => {
       });
     });
   }
-  
+
   const doubleClick = (e, id) => {
     console.log(`doubleClick ${id}`);
     // TODO: open up config dialog for the node
@@ -317,12 +328,17 @@ const Editor = ({ flow }) => {
       click={wireClick} />
   });
 
+  function combinedRef(el) {
+    dropTarget(el);
+    if (el) {
+      boundingBox.current = el.getBoundingClientRect();
+    }
+  }
 
   return (
     <div className="editor" >
-      <svg ref={svgElement} width="1000px" height="1000px"
+      <svg ref={combinedRef} width="1000px" height="1000px"
         shapeRendering="geometricPrecision"
-        onDrop={drop}
         onDragOver={onDragOver}
         onMouseDown={handleMouseDown}>
         <Wire hidden={dragWire.hidden}
